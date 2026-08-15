@@ -16,8 +16,8 @@ import java.net.URL
 class ApiClient(private val context: Context) {
 
     companion object {
-        private const val TAG = "BirrRelayApiClient"
-        private const val PREFS_NAME = "birrrelay_prefs"
+        private const val TAG = "ChekApiClient"
+        private const val PREFS_NAME = "chek_prefs"
         private const val KEY_SERVER_URL = "server_url"
         private const val KEY_DEVICE_TOKEN = "device_token"
         private const val KEY_DEVICE_ID = "device_id"
@@ -96,24 +96,32 @@ class ApiClient(private val context: Context) {
         }
     }
 
+    data class PairResult(val success: Boolean, val message: String)
+
     /**
-     * Pair this phone with the BirrRelay server using the 6-digit PIN
+     * Pair this phone with the Chek server using the 6-digit PIN
      */
-    fun pairWithCode(serverUrl: String, pairingCode: String): Boolean {
+    fun pairWithCode(serverUrl: String, pairingCode: String): PairResult {
         return try {
             val bm = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
             val batteryPct = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
 
-            val cleanUrl = serverUrl.trimEnd('/')
+            var cleanUrl = serverUrl.trim().trimEnd('/')
+            if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
+                cleanUrl = "http://$cleanUrl"
+            }
+            val cleanCode = pairingCode.replace(" ", "").trim()
+
             val url = URL("$cleanUrl/api/v1/device/pair")
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "POST"
             conn.setRequestProperty("Content-Type", "application/json")
             conn.doOutput = true
             conn.connectTimeout = 8000
+            conn.readTimeout = 8000
 
             val payload = JSONObject().apply {
-                put("pairingCode", pairingCode)
+                put("pairingCode", cleanCode)
                 put("deviceName", android.os.Build.MODEL ?: "Android Phone")
                 put("batteryLevel", batteryPct)
             }
@@ -135,13 +143,20 @@ class ApiClient(private val context: Context) {
                     .putBoolean(KEY_IS_PAIRED, true)
                     .apply()
 
-                true
+                PairResult(true, "Device paired successfully!")
             } else {
-                false
+                val errorStream = conn.errorStream
+                val errorMsg = if (errorStream != null) {
+                    val errText = BufferedReader(InputStreamReader(errorStream)).use { it.readText() }
+                    try { JSONObject(errText).optString("error", errText) } catch (_: Exception) { errText }
+                } else {
+                    "HTTP $responseCode"
+                }
+                PairResult(false, errorMsg)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Pairing network error", e)
-            false
+            PairResult(false, e.localizedMessage ?: "Network connection failed. Check Wi-Fi & URL.")
         }
     }
 }

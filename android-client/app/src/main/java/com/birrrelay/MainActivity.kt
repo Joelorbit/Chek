@@ -109,17 +109,18 @@ class MainActivity : Activity() {
 
         CoroutineScope(Dispatchers.IO).launch {
             val apiClient = ApiClient(this@MainActivity)
-            val success = apiClient.pairWithCode(serverUrl, pairingCode)
+            val result = apiClient.pairWithCode(serverUrl, pairingCode)
 
             withContext(Dispatchers.Main) {
                 btnPair.isEnabled = true
-                if (success) {
+                if (result.success) {
                     tvStatus.text = "● Connected & Relaying Payments"
                     tvStatus.setTextColor(Color.parseColor(themePresets[currentThemeIndex].accent))
-                    Toast.makeText(this@MainActivity, "Device paired successfully!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, result.message, Toast.LENGTH_SHORT).show()
                 } else {
-                    tvStatus.text = "✕ Pairing failed. Check PIN or server URL."
+                    tvStatus.text = "✕ " + result.message
                     tvStatus.setTextColor(Color.parseColor("#9E4235"))
+                    Toast.makeText(this@MainActivity, result.message, Toast.LENGTH_LONG).show()
                 }
             }
         }
