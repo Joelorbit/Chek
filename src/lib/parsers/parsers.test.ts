@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseBankMessage, isNonPaymentMessage } from "./index";
 
 describe("Ethiopian Bank Parsers Test Suite", () => {
-  describe("Telebirr Parser", () => {
+  describe("Telebirr Parser Suite (127 Sender)", () => {
     it("should parse standard English P2P transfer with 09 phone", () => {
       const msg =
         "You have received ETB 500.00 from ABEBE BIKILA (0911223344) with transaction number CKL9283741 on 2026-08-15 14:30:22. Your current balance is ETB 12,450.00.";
@@ -30,7 +30,19 @@ describe("Ethiopian Bank Parsers Test Suite", () => {
       expect(result?.referenceId).toBe("TB2408151234");
     });
 
-    it("should parse formatted numbers with commas", () => {
+    it("should parse Telebirr with country code prefix 2519...", () => {
+      const msg =
+        "You have received ETB 100.00 from MUKTAR HASSEN (+251911998877) with transaction number CKL1029384 on 2026-08-15.";
+      const result = parseBankMessage(msg);
+
+      expect(result).not.toBeNull();
+      expect(result?.provider).toBe("TELEBIRR");
+      expect(result?.amount).toBe(100);
+      expect(result?.payerName).toBe("MUKTAR HASSEN");
+      expect(result?.referenceId).toBe("CKL1029384");
+    });
+
+    it("should parse formatted numbers with commas and decimals", () => {
       const msg =
         "You have received ETB 12,500.50 from BIRUK TADESSE (0944112233) with transaction number CKL8829102 on 2026-08-15. Your current balance is ETB 45,000.00.";
       const result = parseBankMessage(msg);
@@ -40,7 +52,7 @@ describe("Ethiopian Bank Parsers Test Suite", () => {
       expect(result?.referenceId).toBe("CKL8829102");
     });
 
-    it("should parse short Telebirr notification", () => {
+    it("should parse short Telebirr notification variant", () => {
       const msg = "Received ETB 250.00 from HAGOS TESFAYE. Txn: CKL392819. Balance: ETB 1,500.00";
       const result = parseBankMessage(msg);
 
@@ -50,9 +62,21 @@ describe("Ethiopian Bank Parsers Test Suite", () => {
       expect(result?.payerName).toBe("HAGOS TESFAYE");
       expect(result?.referenceId).toBe("CKL392819");
     });
+
+    it("should parse Telebirr merchant payment format", () => {
+      const msg =
+        "Payment of ETB 1,200.00 received from YONAS BEKELE (0922334455). Transaction ID: CKL839201. Your balance: ETB 8,400.00.";
+      const result = parseBankMessage(msg);
+
+      expect(result).not.toBeNull();
+      expect(result?.provider).toBe("TELEBIRR");
+      expect(result?.amount).toBe(1200);
+      expect(result?.payerName).toBe("YONAS BEKELE");
+      expect(result?.referenceId).toBe("CKL839201");
+    });
   });
 
-  describe("CBE (Commercial Bank of Ethiopia) Parser", () => {
+  describe("CBE (Commercial Bank of Ethiopia) Parser Suite", () => {
     it("should parse standard CBE Mobile banking credit SMS with full 13-digit account", () => {
       const msg =
         "Dear Customer, your account 1000123456789 has been credited with ETB 1,500.00 by BIRUK TADESSE. Ref: FT242289912039. Current balance is ETB 45,210.00.";
@@ -67,7 +91,7 @@ describe("Ethiopian Bank Parsers Test Suite", () => {
       expect(result?.balanceAfter).toBe(45210);
     });
 
-    it("should parse masked CBE account format", () => {
+    it("should parse masked CBE account format 1000****5678", () => {
       const msg =
         "Dear Customer, your account 1000****5678 has been credited with ETB 750.00 by TESHOME KASSA. Ref: FT2608159281.";
       const result = parseBankMessage(msg);
@@ -77,6 +101,18 @@ describe("Ethiopian Bank Parsers Test Suite", () => {
       expect(result?.amount).toBe(750);
       expect(result?.payerName).toBe("TESHOME KASSA");
       expect(result?.referenceId).toBe("FT2608159281");
+    });
+
+    it("should parse lowercase cbe message with odd spaces", () => {
+      const msg =
+        "dear customer, your account 1000998877 has been credited with etb 350.00 by EYUEL MEKONNEN. Ref: FT992811. Current balance is ETB 5,000.00.";
+      const result = parseBankMessage(msg);
+
+      expect(result).not.toBeNull();
+      expect(result?.provider).toBe("CBE");
+      expect(result?.amount).toBe(350);
+      expect(result?.payerName).toBe("EYUEL MEKONNEN");
+      expect(result?.referenceId).toBe("FT992811");
     });
 
     it("should parse short CBE alert format", () => {
@@ -91,19 +127,33 @@ describe("Ethiopian Bank Parsers Test Suite", () => {
     });
   });
 
-  describe("CBE Birr & Awash & BOA Parsers", () => {
-    it("should parse CBE Birr transfer", () => {
+  describe("Bank of Abyssinia (BOA) Parser Suite", () => {
+    it("should parse standard Bank of Abyssinia credit SMS", () => {
       const msg =
-        "You have received ETB 300.00 from 251911223344 (SELAM TESFAYE). Trans ID: CBEB938291. Balance: ETB 2,500.00";
+        "Bank of Abyssinia: Account 8492*** credited with ETB 1,000.00 from DAWIT MELESE. Ref: BOA928371.";
       const result = parseBankMessage(msg);
 
       expect(result).not.toBeNull();
-      expect(result?.provider).toBe("CBE_BIRR");
-      expect(result?.amount).toBe(300);
-      expect(result?.payerName).toBe("SELAM TESFAYE");
-      expect(result?.referenceId).toBe("CBEB938291");
+      expect(result?.provider).toBe("BOA");
+      expect(result?.amount).toBe(1000);
+      expect(result?.payerName).toBe("DAWIT MELESE");
+      expect(result?.referenceId).toBe("BOA928371");
     });
 
+    it("should parse BOA mobile app push alert", () => {
+      const msg =
+        "BOA Alert: Your account 12345678 has received ETB 2,500.00 from HELEN TESHOME. Txn: BOA881920.";
+      const result = parseBankMessage(msg);
+
+      expect(result).not.toBeNull();
+      expect(result?.provider).toBe("BOA");
+      expect(result?.amount).toBe(2500);
+      expect(result?.payerName).toBe("HELEN TESHOME");
+      expect(result?.referenceId).toBe("BOA881920");
+    });
+  });
+
+  describe("Awash Bank & CBE Birr Suites", () => {
     it("should parse Awash Bank credit alert with 14-digit account", () => {
       const msg =
         "Awash Bank: Your account 01304812345600 has been credited with ETB 750.00 from KASSAHUN GEMECHU. Ref: AWB849201.";
@@ -117,22 +167,28 @@ describe("Ethiopian Bank Parsers Test Suite", () => {
       expect(result?.referenceId).toBe("AWB849201");
     });
 
-    it("should parse Bank of Abyssinia credit alert", () => {
+    it("should parse CBE Birr transfer", () => {
       const msg =
-        "Bank of Abyssinia: Account 8492*** credited with ETB 1,000.00 from DAWIT MELESE. Ref: BOA928371.";
+        "You have received ETB 300.00 from 251911223344 (SELAM TESFAYE). Trans ID: CBEB938291. Balance: ETB 2,500.00";
       const result = parseBankMessage(msg);
 
       expect(result).not.toBeNull();
-      expect(result?.provider).toBe("BOA");
-      expect(result?.amount).toBe(1000);
-      expect(result?.payerName).toBe("DAWIT MELESE");
-      expect(result?.referenceId).toBe("BOA928371");
+      expect(result?.provider).toBe("CBE_BIRR");
+      expect(result?.amount).toBe(300);
+      expect(result?.payerName).toBe("SELAM TESFAYE");
+      expect(result?.referenceId).toBe("CBEB938291");
     });
   });
 
   describe("Privacy & Anti-Leak Filtering (Negative Tests)", () => {
-    it("should reject 2FA OTP codes", () => {
+    it("should reject 2FA OTP codes from Telebirr", () => {
       const otpMsg = "Your Telebirr verification code is 492810. Do not share this code with anyone.";
+      expect(isNonPaymentMessage(otpMsg)).toBe(true);
+      expect(parseBankMessage(otpMsg)).toBeNull();
+    });
+
+    it("should reject CBE internet banking OTP", () => {
+      const otpMsg = "Your CBE Mobile Banking OTP is 839201. Valid for 5 minutes. Do not share.";
       expect(isNonPaymentMessage(otpMsg)).toBe(true);
       expect(parseBankMessage(otpMsg)).toBeNull();
     });
@@ -142,6 +198,12 @@ describe("Ethiopian Bank Parsers Test Suite", () => {
         "You have transferred ETB 300.00 to ALMAZ BEKELE. Your current balance is ETB 4,000.00.";
       expect(isNonPaymentMessage(debitMsg)).toBe(true);
       expect(parseBankMessage(debitMsg)).toBeNull();
+    });
+
+    it("should reject airtime purchase message", () => {
+      const msg = "You bought airtime of ETB 50.00 for 0911223344. Remaining balance: ETB 200.00";
+      expect(isNonPaymentMessage(msg)).toBe(true);
+      expect(parseBankMessage(msg)).toBeNull();
     });
 
     it("should reject random private SMS from family/friends", () => {

@@ -5,6 +5,12 @@ export class TelebirrParser implements BankParser {
 
   canParse(rawMessage: string): boolean {
     const text = rawMessage.toLowerCase();
+    if (
+      (text.includes("abyssinia") || text.includes("boa") || text.includes("awash") || text.includes("cbe")) &&
+      !text.includes("telebirr")
+    ) {
+      return false;
+    }
     return (
       text.includes("telebirr") ||
       (text.includes("you have received etb") && (text.includes("transaction") || text.includes("txn"))) ||

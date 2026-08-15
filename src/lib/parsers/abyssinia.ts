@@ -11,9 +11,10 @@ export class AbyssiniaParser implements BankParser {
   parse(rawMessage: string): ParsedPayment | null {
     const cleanText = rawMessage.replace(/\s+/g, " ").trim();
 
-    // "Bank of Abyssinia: Account 8492*** credited with ETB 1,000.00 from DAWIT MELESE. Ref: BOA928371."
+    // Support: "Bank of Abyssinia: Account 8492*** credited with ETB 1,000.00 from DAWIT MELESE. Ref: BOA928371."
+    // And: "BOA Alert: Your account 12345678 has received ETB 2,500.00 from HELEN TESHOME. Txn: BOA881920."
     const regex =
-      /credited with ETB\s*([\d,.]+)\s*(?:by|from)\s*([^.]+?)\.\s*(?:Ref|Txn)[:\s]*([A-Z0-9]+)/i;
+      /(?:credited with|credited|received|has received)\s*ETB\s*([\d,.]+)\s*(?:by|from)\s*([^.]+?)\.\s*(?:Ref|Txn|Txn ID)[:\s]*([A-Z0-9]+)/i;
 
     const match = cleanText.match(regex);
     if (match) {
