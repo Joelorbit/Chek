@@ -15,6 +15,10 @@ import {
   ShieldCheck,
   Bank,
   PhoneCall,
+  Code,
+  X,
+  Copy,
+  Check,
 } from "@phosphor-icons/react";
 
 interface Transaction {
@@ -26,6 +30,7 @@ interface Transaction {
   payerPhone?: string | null;
   referenceId: string;
   balanceAfter?: number | null;
+  rawMessage?: string | null;
   status: string;
   createdAt: string;
 }
@@ -50,69 +55,50 @@ export default function DashboardPage() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
+  const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
+  const [copiedJson, setCopiedJson] = useState(false);
 
   useEffect(() => {
-    async function init() {
-      let storedKey = localStorage.getItem("birrrelay_api_key");
-
-      if (!storedKey) {
-        try {
-          const email = `dev_${Math.floor(1000 + Math.random() * 9000)}@local.dev`;
-          const res = await fetch("/api/auth/register", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email,
-              password: "defaultPassword123",
-              name: "Solo Developer",
-            }),
-          });
-          const data = await res.json();
-          if (data.user?.apiKey) {
-            const key = data.user.apiKey as string;
-            storedKey = key;
-            localStorage.setItem("birrrelay_api_key", key);
-          }
-        } catch (e) {
-          console.error("Auto registration failed:", e);
-        }
-      }
-
-      if (storedKey) {
-        setApiKey(storedKey);
-        fetchDashboardData(storedKey);
-      }
-    }
-
-    init();
+    fetchDashboardData(true);
+    const interval = setInterval(() => {
+      fetchDashboardData(false);
+    }, 3000);
+    return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    if (!apiKey) return;
-    const interval = setInterval(() => {
-      fetchDashboardData(apiKey, false);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [apiKey]);
-
-  async function fetchDashboardData(key: string, showLoading = true) {
+  async function fetchDashboardData(showLoading = true) {
     if (showLoading) setLoading(true);
     try {
-      const res = await fetch("/api/auth/me", {
-        headers: { "x-api-key": key },
-      });
+      const storedKey = localStorage.getItem("birrrelay_api_key") || "";
+      const headers: Record<string, string> = {};
+      if (storedKey) headers["x-api-key"] = storedKey;
+
+      const res = await fetch("/api/auth/me", { headers });
       if (res.ok) {
         const data = await res.json();
         setStats(data.stats);
         setTransactions(data.transactions || []);
         setDevices(data.devices || []);
         setUserEmail(data.user?.email || "");
+        if (data.user?.apiKey) {
+          setApiKey(data.user.apiKey);
+          if (!storedKey) {
+            localStorage.setItem("birrrelay_api_key", data.user.apiKey);
+          }
+        }
       }
     } catch (err) {
       console.error("Failed to load dashboard data:", err);
     } finally {
       if (showLoading) setLoading(false);
     }
+  }
+
+  function copyJson() {
+    if (!selectedTx) return;
+    navigator.clipboard.writeText(JSON.stringify(selectedTx, null, 2));
+    setCopiedJson(true);
+    setTimeout(() => setCopiedJson(false), 2000);
   }
 
   return (
@@ -185,7 +171,7 @@ export default function DashboardPage() {
               {stats.onlineDeviceCount} / {stats.deviceCount}
               {stats.onlineDeviceCount > 0 ? (
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-eyu bg-[var(--accent-soft)] text-[var(--accent-strong)] dark:text-[var(--ink)] border border-[var(--accent)]/40 font-medium">
-                  Active
+                  Active ({devices[0]?.deviceName || "Phone"})
                 </span>
               ) : (
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-eyu bg-[var(--surface-elevated)] text-[var(--text-muted)] font-medium">
@@ -193,7 +179,9 @@ export default function DashboardPage() {
                 </span>
               )}
             </div>
-            <div className="text-[11px] text-[var(--text-faint)] mt-2 font-mono">5-minute battery heartbeat</div>
+            <div className="text-[11px] text-[var(--text-faint)] mt-2 font-mono">
+              Battery: {devices[0]?.batteryLevel ?? 100}%
+            </div>
           </div>
 
           {/* API Key Box */}
@@ -220,11 +208,11 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2">
               <h2 className="text-base font-bold text-[var(--ink)] tracking-tight">Live Payment Stream</h2>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-eyu bg-[var(--accent-soft)] text-[var(--accent-strong)] dark:text-[var(--ink)] border border-[var(--accent)]/40 font-medium">
-                Auto-syncing
+                Auto-syncing (3s)
               </span>
             </div>
             <button
-              onClick={() => fetchDashboardData(apiKey)}
+              onClick={() => fetchDashboardData(true)}
               className="text-xs text-[var(--text-muted)] hover:text-[var(--ink)] flex items-center gap-1.5 transition-colors font-mono"
             >
               <ArrowsClockwise size={14} weight="duotone" />
@@ -244,7 +232,7 @@ export default function DashboardPage() {
               </div>
               <h3 className="font-heading text-sm font-bold text-[var(--ink)] mb-1">No Payments Received Yet</h3>
               <p className="text-xs text-[var(--text-muted)] max-w-sm mb-5">
-                Pair your Android phone or use the built-in Simulator to trigger a test CBE or Telebirr payment.
+                Send an SMS or transfer to your paired phone to see transactions appear live!
               </p>
               <Link
                 href="/dashboard/simulator"
@@ -259,7 +247,8 @@ export default function DashboardPage() {
               {transactions.map((tx) => (
                 <div
                   key={tx.id}
-                  className="p-4 rounded-eyu bg-[var(--surface)] border border-[var(--line)] hover:border-[var(--line-strong)] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm"
+                  onClick={() => setSelectedTx(tx)}
+                  className="p-4 rounded-eyu bg-[var(--surface)] border border-[var(--line)] hover:border-[var(--accent)] cursor-pointer transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm hover:shadow-md"
                 >
                   <div className="flex items-start sm:items-center gap-3">
                     <div
@@ -295,6 +284,9 @@ export default function DashboardPage() {
                           <Clock size={13} weight="duotone" />
                           {new Date(tx.createdAt).toLocaleTimeString()}
                         </span>
+                        <span className="text-[10px] text-[var(--complement)] flex items-center gap-0.5">
+                          <Code size={12} weight="bold" /> Click to inspect JSON
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -312,6 +304,68 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+
+        {/* Odit-Style Transaction Raw Message & JSON Inspector Modal */}
+        {selectedTx && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-[var(--surface)] border border-[var(--line)] rounded-eyu max-w-2xl w-full p-6 shadow-2xl relative">
+              <div className="flex items-center justify-between pb-4 border-b border-[var(--line)] mb-4">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-heading text-base font-bold text-[var(--ink)]">
+                    Payment Inspector — Ref {selectedTx.referenceId}
+                  </h3>
+                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-eyu bg-[var(--accent-soft)] text-[var(--accent-strong)] dark:text-[var(--ink)]">
+                    {selectedTx.status}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setSelectedTx(null)}
+                  className="p-1 rounded-eyu hover:bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-[var(--ink)] transition-colors"
+                >
+                  <X size={18} weight="bold" />
+                </button>
+              </div>
+
+              {/* Raw Intercepted SMS */}
+              <div className="mb-4">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-muted)] font-semibold block mb-1.5">
+                  📱 Raw Intercepted Bank Message / SMS
+                </span>
+                <div className="p-3 bg-[var(--surface-pressed)] rounded-eyu border border-[var(--line)] font-mono text-xs text-[var(--ink)] leading-relaxed">
+                  {selectedTx.rawMessage || "Payment alert received via companion relay."}
+                </div>
+              </div>
+
+              {/* Parsed JSON Payload */}
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-muted)] font-semibold">
+                    ⚙️ Parsed Webhook JSON Payload
+                  </span>
+                  <button
+                    onClick={copyJson}
+                    className="text-xs text-[var(--text-muted)] hover:text-[var(--ink)] inline-flex items-center gap-1 font-mono"
+                  >
+                    {copiedJson ? <Check size={13} weight="bold" className="text-[var(--accent)]" /> : <Copy size={13} weight="duotone" />}
+                    {copiedJson ? "Copied JSON" : "Copy JSON"}
+                  </button>
+                </div>
+                <pre className="p-3 bg-[var(--surface-pressed)] rounded-eyu border border-[var(--line)] font-mono text-xs text-[var(--complement)] overflow-x-auto max-h-56">
+                  <code>{JSON.stringify(selectedTx, null, 2)}</code>
+                </pre>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-[var(--line)]">
+                <button
+                  onClick={() => setSelectedTx(null)}
+                  className="px-4 py-1.5 rounded-eyu text-xs font-semibold bg-[var(--accent)] text-white dark:text-[#d3d5d0] hover:opacity-90 transition-all font-mono"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

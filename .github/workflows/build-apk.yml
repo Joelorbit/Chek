@@ -3,7 +3,12 @@ name: Build Chek Android APK
 on:
   push:
     branches: [ main, master ]
+    tags:
+      - 'v*'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -42,3 +47,18 @@ jobs:
             android-client/build-outputs/Chek-v1.0.apk
             android-client/app/build/outputs/apk/debug/*.apk
           retention-days: 30
+
+      - name: Publish Direct GitHub Release
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: android-client/build-outputs/Chek-v1.0.apk
+          name: Chek Android Companion App v1.0.0
+          tag_name: v1.0.0
+          body: |
+            ## 🧾 Chek Android Companion App v1.0.0
+            - 🔒 On-device privacy filtering for CBE & Telebirr payments
+            - ⚡ Instant relay to webhooks and bots
+            - 🎨 EyuTheme Dark/Light UI
+          draft: false
+          prerelease: false

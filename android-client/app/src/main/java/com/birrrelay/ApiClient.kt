@@ -76,8 +76,35 @@ class ApiClient(private val context: Context) {
 
                     val responseCode = conn.responseCode
                     Log.d(TAG, "Payment event sent. Status code: $responseCode")
+        fun sendRawSmsEvent(context: Context, rawMessage: String) {
+            val token = getDeviceToken(context)
+            val apiKey = getApiKey(context)
+            if (token == null && apiKey == null) return
+
+            val serverUrl = getServerUrl(context)
+
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val url = URL("$serverUrl/api/v1/relay/event")
+                    val conn = url.openConnection() as HttpURLConnection
+                    conn.requestMethod = "POST"
+                    conn.setRequestProperty("Content-Type", "application/json")
+                    if (token != null) conn.setRequestProperty("x-device-token", token)
+                    if (apiKey != null) conn.setRequestProperty("x-api-key", apiKey)
+                    conn.doOutput = true
+                    conn.connectTimeout = 12000
+                    conn.readTimeout = 12000
+
+                    val payload = JSONObject().apply {
+                        put("rawMessage", rawMessage)
+                    }
+
+                    OutputStreamWriter(conn.outputStream).use { it.write(payload.toString()) }
+
+                    val responseCode = conn.responseCode
+                    Log.d(TAG, "Raw SMS relay sent. Status code: $responseCode")
                 } catch (e: Exception) {
-                    Log.e(TAG, "Failed to relay payment event", e)
+                    Log.e(TAG, "Failed to relay raw SMS", e)
                 }
             }
         }

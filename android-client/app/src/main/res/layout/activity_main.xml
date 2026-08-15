@@ -19,30 +19,103 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="20dp">
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="18dp">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="🧾 Chek"
-                android:textColor="@color/eyu_ink_dark"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/ivBrandIcon"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:src="@drawable/ic_launcher_foreground"
+                    android:layout_marginEnd="10dp" />
+
+                <TextView
+                    android:id="@+id/tvBrandTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chek"
+                    android:textColor="@color/eyu_ink_dark"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <!-- Theme Toggle Chip -->
             <Button
                 android:id="@+id/btnThemeToggle"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="38dp"
                 android:text="☀️ Light"
                 android:textSize="11sp"
                 android:textColor="@color/eyu_ink_dark"
                 android:backgroundTint="@color/eyu_surface_elevated_dark" />
         </LinearLayout>
 
-        <!-- Main Card Container -->
+        <!-- Live Status Card -->
+        <LinearLayout
+            android:id="@+id/statusCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/eyu_surface_dark"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="6dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="RELAY STATUS"
+                    android:textColor="@color/eyu_golden_ochre"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1" />
+
+                <TextView
+                    android:id="@+id/tvBatteryPct"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔋 --%"
+                    android:textColor="@color/eyu_ink_muted_dark"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="● Ready to connect"
+                android:textColor="@color/eyu_olive_moss"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:id="@+id/tvPrivacyNotice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔒 On-Device Privacy Guard: Only incoming credit SMS (CBE, Telebirr, Awash) are parsed. OTPs, 2FA tokens, and personal texts are dropped locally on your phone."
+                android:textColor="@color/eyu_ink_muted_dark"
+                android:textSize="10sp"
+                android:lineSpacingExtra="2dp" />
+
+        </LinearLayout>
+
+        <!-- Main Pairing Card -->
         <LinearLayout
             android:id="@+id/mainCard"
             android:layout_width="match_parent"
@@ -55,7 +128,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="CONNECT DEVICE"
+                android:text="SERVER CONNECTION"
                 android:textColor="@color/eyu_golden_ochre"
                 android:textSize="10sp"
                 android:textStyle="bold"
@@ -66,16 +139,17 @@
                 android:id="@+id/tvCardSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Enter Server URL and 6-Digit PIN or API Key"
+                android:text="Connect via Local Wi-Fi or Cloud Tunnel / 4G"
                 android:textColor="@color/eyu_ink_muted_dark"
                 android:textSize="12sp"
                 android:layout_marginBottom="16dp" />
 
             <!-- Server URL -->
             <TextView
+                android:id="@+id/tvServerUrlLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Server URL"
+                android:text="Server URL (Wi-Fi IP or Cloud HTTPS URL)"
                 android:textColor="@color/eyu_ink_muted_dark"
                 android:textSize="11sp"
                 android:layout_marginBottom="4dp" />
@@ -89,7 +163,7 @@
                 <EditText
                     android:id="@+id/etServerUrl"
                     android:layout_width="0dp"
-                    android:layout_height="46dp"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
                     android:hint="http://192.168.1.11:3000"
                     android:textColor="@color/eyu_ink_dark"
@@ -101,7 +175,7 @@
                 <Button
                     android:id="@+id/btnTestPing"
                     android:layout_width="wrap_content"
-                    android:layout_height="46dp"
+                    android:layout_height="48dp"
                     android:text="⚡ Ping"
                     android:textSize="11sp"
                     android:textColor="@color/eyu_golden_ochre"
@@ -137,18 +211,18 @@
             <Button
                 android:id="@+id/btnPair"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="50dp"
                 android:text="Pair &amp; Activate Relay"
                 android:textColor="@color/eyu_ink_dark"
                 android:backgroundTint="@color/eyu_olive_moss"
                 android:textStyle="bold"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 
-        <!-- Status Card -->
+        <!-- Live Activity Log Card -->
         <LinearLayout
-            android:id="@+id/statusCard"
+            android:id="@+id/logCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -158,30 +232,21 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="RELAY STATUS"
+                android:text="LIVE PARSED PAYMENTS"
                 android:textColor="@color/eyu_golden_ochre"
                 android:textSize="10sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.1"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="● Ready to connect"
-                android:textColor="@color/eyu_olive_moss"
-                android:textSize="12sp"
-                android:textStyle="bold"
                 android:layout_marginBottom="6dp" />
 
             <TextView
-                android:id="@+id/tvPrivacyNotice"
-                android:layout_width="wrap_content"
+                android:id="@+id/tvLiveLog"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🔒 On-Device Privacy: Only payment SMS (CBE, Telebirr, Awash) are parsed. OTPs, 2FA tokens, and private messages are discarded locally on this phone."
+                android:text="No transactions intercepted yet.\nSend an SMS or payment to test."
                 android:textColor="@color/eyu_ink_muted_dark"
-                android:textSize="10sp"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
                 android:lineSpacingExtra="2dp" />
 
         </LinearLayout>

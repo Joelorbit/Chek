@@ -9,6 +9,10 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <!-- SMS Interception Permissions (for instant bank credit SMS) -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -28,7 +32,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Safe Notification Listener Service (CBE & Telebirr) -->
+        <!-- Safe Notification Listener Service (Telebirr & CBE Apps) -->
         <service
             android:name=".NotificationListener"
             android:label="Chek Bank Notification Service"
@@ -38,6 +42,16 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <!-- Broadcast Receiver for Direct Bank SMS (CBE, Telebirr, Awash) -->
+        <receiver
+            android:name=".SmsReceiver"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
+            <intent-filter android:priority="999">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 
