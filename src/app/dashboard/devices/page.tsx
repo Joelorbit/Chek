@@ -11,7 +11,6 @@ import {
   Clock,
   Copy,
   Check,
-  Key,
   ArrowsClockwise,
 } from "@phosphor-icons/react";
 
@@ -31,18 +30,12 @@ export default function DevicesPage() {
   const [pairingCode, setPairingCode] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [copiedPin, setCopiedPin] = useState(false);
-  const [copiedKey, setCopiedKey] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let key = localStorage.getItem("birrrelay_api_key");
     if (!key) {
-      // Auto-register / load default demo key
-      fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: "dev@chek.et", password: "password123", name: "Solo Dev" }),
-      })
+      fetch("/api/auth/me")
         .then((r) => r.json())
         .then((data) => {
           if (data.user?.apiKey) {
@@ -76,14 +69,13 @@ export default function DevicesPage() {
   }
 
   async function generateCode() {
-    if (!apiKey) return;
     setGenerating(true);
     try {
       const res = await fetch("/api/v1/device/generate-code", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": apiKey,
+          ...(apiKey ? { "x-api-key": apiKey } : {}),
         },
         body: JSON.stringify({ deviceName: "Android Companion" }),
       });
@@ -105,13 +97,6 @@ export default function DevicesPage() {
     setTimeout(() => setCopiedPin(false), 2000);
   }
 
-  function copyKey() {
-    if (!apiKey) return;
-    navigator.clipboard.writeText(apiKey);
-    setCopiedKey(true);
-    setTimeout(() => setCopiedKey(false), 2000);
-  }
-
   return (
     <div className="min-h-screen flex flex-col bg-[var(--bg)] text-[var(--ink)] transition-colors duration-200">
       <Navbar />
@@ -120,11 +105,11 @@ export default function DevicesPage() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[var(--line)]">
           <div>
             <h1 className="text-2xl font-bold text-[var(--ink)] tracking-tight flex items-center gap-2">
-              Connected Android Devices
+              Connected Android Relays
               <DeviceMobile size={22} weight="duotone" className="text-[var(--accent)]" />
             </h1>
             <p className="text-xs text-[var(--text-muted)] mt-1">
-              Pair your Android companion phone via 6-digit PIN or direct API Key.
+              Pair your Android companion phone via 6-digit PIN to automate personal Ethiopian bank payments.
             </p>
           </div>
 
@@ -140,64 +125,44 @@ export default function DevicesPage() {
             <button
               onClick={generateCode}
               disabled={generating}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-eyu text-xs font-semibold bg-[var(--accent)] text-white dark:text-[#d3d5d0] hover:opacity-90 border border-[var(--accent)]/60 transition-all disabled:opacity-50 shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-eyu text-xs font-bold bg-[var(--accent)] text-white dark:text-[#d3d5d0] hover:opacity-90 border border-[var(--accent)]/60 transition-all disabled:opacity-50 shadow-sm"
             >
               <Plus size={16} weight="bold" />
-              {generating ? "Generating PIN..." : "Pair New Device"}
+              {generating ? "Generating PIN..." : "Pair New Phone"}
             </button>
           </div>
         </div>
 
-        {/* 6-Digit Pairing & API Key Box */}
+        {/* 6-Digit Pairing Box */}
         {pairingCode && (
-          <div className="my-6 p-6 sm:p-8 rounded-eyu bg-[var(--surface)] border-2 border-[var(--accent)] shadow-md">
-            <div className="max-w-xl mx-auto text-center">
-              <div className="w-10 h-10 rounded-eyu bg-[var(--accent-soft)] border border-[var(--accent)]/40 flex items-center justify-center text-[var(--ink)] mx-auto mb-3">
-                <DeviceMobile size={20} weight="duotone" />
+          <div className="my-6 p-6 sm:p-8 rounded-eyu bg-[var(--surface)] border-2 border-[var(--accent)] shadow-lg">
+            <div className="max-w-md mx-auto text-center">
+              <div className="w-12 h-12 rounded-eyu bg-[var(--accent-soft)] border border-[var(--accent)]/40 flex items-center justify-center text-[var(--ink)] mx-auto mb-3">
+                <DeviceMobile size={24} weight="duotone" />
               </div>
-              <h3 className="font-heading text-base font-bold text-[var(--ink)] mb-1">
-                Enter Details in Chek Android App
+              <h3 className="font-heading text-lg font-bold text-[var(--ink)] mb-1">
+                Enter 6-Digit PIN on Your Phone
               </h3>
               <p className="text-xs text-[var(--text-muted)] mb-5">
-                Open the Chek app on your phone and enter either the 6-digit PIN or your API Key:
+                Open Chek on your Android phone, go to the <strong>⚡ Relay</strong> tab, and enter this 6-digit PIN:
               </p>
 
-              {/* Method 1: 6-Digit PIN */}
-              <div className="p-4 rounded-eyu bg-[var(--surface-pressed)] border border-[var(--line)] mb-4">
-                <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[var(--text-muted)] block mb-2">
-                  Option 1: Quick 6-Digit PIN
-                </span>
-                <div className="inline-flex items-center justify-center gap-2 sm:gap-3 font-mono text-3xl font-extrabold text-[var(--complement)] tracking-widest px-4 py-2">
+              {/* 6-Digit Display */}
+              <div className="p-5 rounded-eyu bg-[var(--surface-pressed)] border border-[var(--line)] mb-5">
+                <div className="inline-flex items-center justify-center gap-3 font-mono text-4xl font-extrabold text-[var(--complement)] tracking-widest px-4 py-2">
                   {pairingCode.split("").map((digit, i) => (
-                    <span key={i} className="w-7 text-center">
+                    <span key={i} className="w-8 text-center bg-[var(--surface)] py-1.5 rounded-eyu border border-[var(--line)] shadow-inner">
                       {digit}
                     </span>
                   ))}
                 </div>
-                <div className="mt-2">
+                <div className="mt-4">
                   <button
                     onClick={copyPin}
-                    className="px-3 py-1 rounded-eyu text-xs font-semibold bg-[var(--surface-elevated)] hover:bg-[var(--surface-raised)] text-[var(--ink)] border border-[var(--line)] inline-flex items-center gap-1.5 transition-colors font-mono"
+                    className="px-4 py-1.5 rounded-eyu text-xs font-semibold bg-[var(--surface-elevated)] hover:bg-[var(--surface)] text-[var(--ink)] border border-[var(--line)] inline-flex items-center gap-1.5 transition-colors font-mono"
                   >
-                    {copiedPin ? <Check size={13} weight="bold" className="text-[var(--accent)]" /> : <Copy size={13} weight="duotone" />}
-                    {copiedPin ? "Copied PIN" : "Copy PIN"}
-                  </button>
-                </div>
-              </div>
-
-              {/* Method 2: Direct API Key */}
-              <div className="p-4 rounded-eyu bg-[var(--surface-pressed)] border border-[var(--line)] mb-5">
-                <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[var(--text-muted)] block mb-2">
-                  Option 2: Direct API Key (Never Expires)
-                </span>
-                <div className="flex items-center justify-between gap-2 bg-[var(--surface)] p-2 rounded-eyu border border-[var(--line)]">
-                  <span className="font-mono text-xs text-[var(--ink)] truncate">{apiKey}</span>
-                  <button
-                    onClick={copyKey}
-                    className="px-2.5 py-1 rounded-eyu text-xs font-semibold bg-[var(--accent-soft)] hover:bg-[var(--accent)] text-[var(--accent-strong)] dark:text-[var(--ink)] hover:text-white border border-[var(--accent)]/40 shrink-0 inline-flex items-center gap-1 font-mono transition-colors"
-                  >
-                    {copiedKey ? <Check size={12} weight="bold" /> : <Copy size={12} weight="duotone" />}
-                    {copiedKey ? "Copied" : "Copy Key"}
+                    {copiedPin ? <Check size={14} weight="bold" className="text-[var(--accent)]" /> : <Copy size={14} weight="duotone" />}
+                    {copiedPin ? "Copied PIN" : "Copy 6-Digit PIN"}
                   </button>
                 </div>
               </div>
@@ -205,9 +170,9 @@ export default function DevicesPage() {
               <div className="flex items-center justify-center gap-2">
                 <button
                   onClick={() => setPairingCode(null)}
-                  className="px-4 py-1.5 rounded-eyu text-xs font-semibold bg-[var(--surface-elevated)] hover:bg-[var(--surface-raised)] text-[var(--text-muted)] hover:text-[var(--ink)] border border-[var(--line)] transition-colors"
+                  className="px-4 py-1.5 rounded-eyu text-xs font-semibold bg-[var(--surface-elevated)] hover:bg-[var(--surface)] text-[var(--text-muted)] hover:text-[var(--ink)] border border-[var(--line)] transition-colors"
                 >
-                  Close Box
+                  Close
                 </button>
               </div>
 
@@ -227,12 +192,19 @@ export default function DevicesPage() {
               Loading devices...
             </div>
           ) : devices.length === 0 ? (
-            <div className="p-10 rounded-eyu bg-[var(--surface)] border border-dashed border-[var(--line)] text-center">
-              <DeviceMobile size={28} weight="duotone" className="text-[var(--text-faint)] mx-auto mb-2" />
-              <h3 className="font-heading text-sm font-bold text-[var(--ink)] mb-1">No Phone Paired Yet</h3>
-              <p className="text-xs text-[var(--text-muted)] max-w-sm mx-auto mb-4">
-                Click &quot;Pair New Device&quot; above to connect your Android phone as a live payment relay.
+            <div className="p-12 rounded-eyu bg-[var(--surface)] border border-dashed border-[var(--line)] text-center">
+              <DeviceMobile size={32} weight="duotone" className="text-[var(--text-faint)] mx-auto mb-3" />
+              <h3 className="font-heading text-base font-bold text-[var(--ink)] mb-1">No Phone Paired Yet</h3>
+              <p className="text-xs text-[var(--text-muted)] max-w-sm mx-auto mb-5">
+                Click &quot;Pair New Phone&quot; above to generate your 6-digit PIN and connect your Android companion.
               </p>
+              <button
+                onClick={generateCode}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-eyu text-xs font-bold bg-[var(--accent)] text-white dark:text-[#d3d5d0] hover:opacity-90 border border-[var(--accent)]/60 transition-all shadow-sm"
+              >
+                <Plus size={15} weight="bold" />
+                Pair New Phone
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

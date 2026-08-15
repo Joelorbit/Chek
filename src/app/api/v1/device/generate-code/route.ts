@@ -5,16 +5,25 @@ import { generatePairingCode, validateApiKey } from "@/lib/auth";
 export async function POST(req: NextRequest) {
   try {
     const apiKey = req.headers.get("x-api-key");
-    const user = await validateApiKey(apiKey);
+    let user = null;
+
+    if (apiKey) {
+      user = await validateApiKey(apiKey);
+    }
+
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized. Valid x-api-key required." }, { status: 401 });
+      user = await db.user.findFirst({ orderBy: { createdAt: "asc" } });
+    }
+
+    if (!user) {
+      return NextResponse.json({ error: "No active merchant account found." }, { status: 401 });
     }
 
     const body = await req.json().catch(() => ({}));
     const deviceName = body.deviceName || "My Android Phone";
 
     const pairingCode = generatePairingCode();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes validity
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 60 minutes validity
 
     const device = await db.device.create({
       data: {
@@ -31,7 +40,7 @@ export async function POST(req: NextRequest) {
       deviceId: device.id,
       pairingCode,
       expiresAt: expiresAt.toISOString(),
-      instructions: "Open BirrRelay on your Android device and enter this 6-digit PIN to pair.",
+      instructions: "Open Chek app on your Android phone and enter this 6-digit PIN to pair.",
     });
   } catch (err: unknown) {
     const error = err as Error;

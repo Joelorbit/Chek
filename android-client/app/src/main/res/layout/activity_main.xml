@@ -43,8 +43,8 @@
                 android:id="@+id/tvTopStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="● Companion Relay Active"
-                android:textColor="@color/eyu_olive_moss"
+                android:text="● Ready to Pair"
+                android:textColor="@color/eyu_ink_muted_dark"
                 android:textSize="10sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -53,7 +53,7 @@
             android:id="@+id/tvBatteryBadge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="62%"
+            android:text="🔋 100%"
             android:textColor="@color/eyu_golden_ochre"
             android:textSize="11sp"
             android:textStyle="bold"
@@ -75,7 +75,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp"
+            android:paddingHorizontal="18dp"
             android:paddingBottom="24dp">
 
             <!-- ================= TAB 1: HOME / FEED ================= -->
@@ -86,7 +86,7 @@
                 android:orientation="vertical"
                 android:visibility="visible">
 
-                <!-- Volume Summary Card -->
+                <!-- Volume Summary Hero Card -->
                 <LinearLayout
                     android:id="@+id/cardVolumeSummary"
                     android:layout_width="match_parent"
@@ -111,7 +111,7 @@
                         android:layout_height="wrap_content"
                         android:text="0.00 ETB"
                         android:textColor="@color/eyu_ink_dark"
-                        android:textSize="28sp"
+                        android:textSize="30sp"
                         android:textStyle="bold"
                         android:layout_marginTop="4dp"
                         android:layout_marginBottom="2dp" />
@@ -120,7 +120,7 @@
                         android:id="@+id/tvHomeCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 payments relayed • 0% gateway cuts"
+                        android:text="0 payments intercepted • 0% gateway cuts"
                         android:textColor="@color/eyu_ink_muted_dark"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -129,8 +129,8 @@
                 <Button
                     android:id="@+id/btnSyncPastSms"
                     android:layout_width="match_parent"
-                    android:layout_height="46dp"
-                    android:text="Sync Past Bank SMS Inbox"
+                    android:layout_height="48dp"
+                    android:text="🔄 Sync Past Bank SMS Inbox"
                     android:textSize="12sp"
                     android:textColor="@color/eyu_golden_ochre"
                     android:backgroundTint="@color/eyu_surface_elevated_dark"
@@ -141,31 +141,32 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="INTERCEPTED PAYMENT STREAM"
+                    android:text="INTERCEPTED PAYMENT FEED"
                     android:textColor="@color/eyu_golden_ochre"
                     android:textSize="10sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.1"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="10dp" />
 
-                <!-- Payment Feed Card -->
-                <LinearLayout
-                    android:id="@+id/cardFeedStream"
+                <!-- Empty State Message -->
+                <TextView
+                    android:id="@+id/tvEmptyFeed"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
+                    android:text="No payments intercepted yet. Tap 'Sync Past Bank SMS Inbox' above or receive an SMS from Telebirr (127), CBE, Abyssinia, or Awash."
+                    android:textColor="@color/eyu_ink_muted_dark"
+                    android:textSize="12sp"
                     android:background="@drawable/card_rounded_dark"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:lineSpacingExtra="3dp"
+                    android:visibility="visible" />
 
-                    <TextView
-                        android:id="@+id/tvHomeFeed"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Ready and listening for incoming bank SMS &amp; notifications from CBE, 127 (Telebirr), Abyssinia, and Awash."
-                        android:textColor="@color/eyu_ink_muted_dark"
-                        android:textSize="12sp"
-                        android:lineSpacingExtra="3dp" />
-                </LinearLayout>
+                <!-- Dynamic Container for Payment Cards -->
+                <LinearLayout
+                    android:id="@+id/llPaymentCards"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
             </LinearLayout>
 
             <!-- ================= TAB 2: RELAY / ENGINE ================= -->
@@ -199,7 +200,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Server URL (Local Wi-Fi or 4G Cloud Tunnel)"
+                        android:text="Server URL (Wi-Fi IP or Cloud Domain)"
                         android:textColor="@color/eyu_ink_muted_dark"
                         android:textSize="11sp"
                         android:layout_marginBottom="4dp" />
@@ -208,7 +209,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="14dp">
+                        android:layout_marginBottom="16dp">
 
                         <EditText
                             android:id="@+id/etServerUrl"
@@ -226,18 +227,18 @@
                             android:id="@+id/btnTestPing"
                             android:layout_width="wrap_content"
                             android:layout_height="48dp"
-                            android:text="Ping"
+                            android:text="⚡ Ping"
                             android:textSize="11sp"
                             android:textColor="@color/eyu_golden_ochre"
                             android:backgroundTint="@color/eyu_surface_elevated_dark"
                             android:layout_marginStart="8dp" />
                     </LinearLayout>
 
-                    <!-- PIN / API Key -->
+                    <!-- 6-Digit PIN Entry -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="6-Digit PIN or API Key (br_live_...)"
+                        android:text="Enter 6-Digit PIN (From Web Dashboard)"
                         android:textColor="@color/eyu_ink_muted_dark"
                         android:textSize="11sp"
                         android:layout_marginBottom="4dp" />
@@ -245,14 +246,17 @@
                     <EditText
                         android:id="@+id/etPairingCode"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:hint="PIN or br_live_..."
+                        android:layout_height="52dp"
+                        android:hint="• • • • • •"
                         android:textColor="@color/eyu_golden_ochre"
                         android:textColorHint="#55848580"
                         android:background="@color/eyu_surface_pressed_dark"
                         android:padding="10dp"
-                        android:textSize="14sp"
+                        android:textSize="22sp"
                         android:textStyle="bold"
+                        android:letterSpacing="0.2"
+                        android:inputType="number"
+                        android:maxLength="6"
                         android:gravity="center"
                         android:layout_marginBottom="16dp" />
 
@@ -260,12 +264,12 @@
                     <Button
                         android:id="@+id/btnPair"
                         android:layout_width="match_parent"
-                        android:layout_height="48dp"
+                        android:layout_height="50dp"
                         android:text="Pair &amp; Activate Relay"
                         android:textColor="@color/eyu_ink_dark"
                         android:backgroundTint="@color/eyu_olive_moss"
                         android:textStyle="bold"
-                        android:textSize="13sp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <!-- Permissions Status Card -->
@@ -291,7 +295,7 @@
                         android:id="@+id/btnGrantNotification"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:text="Notification Listener Active"
+                        android:text="✓ Notification Listener Active"
                         android:textSize="11sp"
                         android:textColor="@color/eyu_ink_dark"
                         android:backgroundTint="@color/eyu_surface_elevated_dark"
@@ -301,7 +305,7 @@
                         android:id="@+id/btnGrantSms"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:text="SMS Telephony Interceptor Active"
+                        android:text="✓ SMS Telephony Interceptor Active"
                         android:textSize="11sp"
                         android:textColor="@color/eyu_ink_dark"
                         android:backgroundTint="@color/eyu_surface_elevated_dark" />
@@ -369,7 +373,7 @@
                         android:id="@+id/tvTerminalLogs"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="[Chek Relay Daemon Initialized]\nWaiting for event dispatch..."
+                        android:text="[Chek Relay Daemon Engine Active]\nListening for incoming bank transactions..."
                         android:textColor="@color/eyu_ink_muted_dark"
                         android:textSize="11sp"
                         android:fontFamily="monospace"
@@ -412,7 +416,7 @@
                 android:id="@+id/tvDockHomeText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Live Feed"
+                android:text="Feed"
                 android:textColor="@color/eyu_olive_moss"
                 android:textSize="10sp"
                 android:textStyle="bold"

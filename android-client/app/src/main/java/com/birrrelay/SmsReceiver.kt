@@ -26,35 +26,61 @@ class SmsReceiver : BroadcastReceiver() {
 
             Log.i(TAG, "Incoming SMS from [$sender]: $rawMessage")
 
-            // Check known Ethiopian banking senders & shortcodes
             val senderLower = sender.lowercase()
-            val isKnownBankSender = sender == "127" || 
-                    senderLower.contains("cbe") || 
-                    sender == "889" || 
-                    senderLower.contains("abyssinia") || 
-                    senderLower.contains("boa") || 
+            val isKnownBankSender = sender == "127" ||
+                    senderLower.contains("cbe") ||
+                    sender == "889" ||
+                    senderLower.contains("abyssinia") ||
+                    senderLower.contains("boa") ||
                     senderLower.contains("awash")
 
-            // Parse through on-device bank parser & privacy guard
             val payment = BankParser.parse(rawMessage)
             if (payment != null) {
                 Log.i(TAG, "⚡ Valid Payment SMS intercepted! Provider: ${payment.provider}, Amount: ${payment.amount}, Ref: ${payment.referenceId}")
-                ApiClient.sendPaymentEvent(context, payment)
 
+                // 1. Save to local device storage immediately
+                val store = LocalPaymentStore(context)
+                val stored = StoredPayment(
+                    id = System.currentTimeMillis().toString(),
+                    provider = payment.provider,
+                    amount = payment.amount,
+                    currency = payment.currency,
+                    payerName = payment.payerName,
+                    payerPhoneOrAcc = payment.payerPhoneOrAcc,
+                    referenceId = payment.referenceId,
+                    rawMessage = payment.rawMessage,
+                    timestamp = System.currentTimeMillis(),
+                    isRelayed = false
+                )
+                store.savePayment(stored)
+
+                // 2. Broadcast to UI for immediate card render
                 val logIntent = Intent("com.chek.PAYMENT_RECEIVED").apply {
-                    putExtra("payment_log", "⚡ [${payment.provider}] +${payment.amount} ETB\nFrom: ${payment.payerName}\nRef: ${payment.referenceId}\nStatus: Relayed & Verified ✓")
+                    putExtra("provider", payment.provider)
                     putExtra("amount", payment.amount)
+                    putExtra("payerName", payment.payerName)
+                    putExtra("payerPhone", payment.payerPhoneOrAcc ?: "")
+                    putExtra("referenceId", payment.referenceId)
+                    putExtra("rawMessage", rawMessage)
                     setPackage(context.packageName)
                 }
                 context.sendBroadcast(logIntent)
+
+                // 3. Relay to server asynchronously
+                ApiClient.sendPaymentEvent(context, payment) { success ->
+                    if (success) {
+                        store.markAsRelayed(payment.referenceId)
+                    }
+                }
             } else {
-                // If it came from 127, CBE, or Abyssinia, forward raw message to server for cloud regex parsing
+                // If from known bank shortcode, forward to server for cloud regex matching
                 if (isKnownBankSender && !BankParser.isNonPaymentMessage(rawMessage)) {
-                    Log.i(TAG, "Relaying bank SMS from sender $sender to Chek server...")
+                    Log.i(TAG, "Forwarding raw bank SMS to server from sender: $sender")
                     ApiClient.sendRawSmsEvent(context, rawMessage)
 
-                    val logIntent = Intent("com.chek.PAYMENT_RECEIVED").apply {
-                        putExtra("payment_log", "📩 [SMS from $sender] Forwarded to server for verification:\n$rawMessage")
+                    val logIntent = Intent("com.chek.RAW_SMS_LOG").apply {
+                        putExtra("sender", sender)
+                        putExtra("rawMessage", rawMessage)
                         setPackage(context.packageName)
                     }
                     context.sendBroadcast(logIntent)

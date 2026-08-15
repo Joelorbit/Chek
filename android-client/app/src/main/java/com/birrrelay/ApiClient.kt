@@ -23,12 +23,11 @@ class ApiClient(private val context: Context) {
         private const val KEY_SERVER_URL = "server_url"
         private const val KEY_DEVICE_TOKEN = "device_token"
         private const val KEY_DEVICE_ID = "device_id"
-        private const val KEY_API_KEY = "api_key"
         private const val KEY_IS_PAIRED = "is_paired"
 
         fun getServerUrl(context: Context): String {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            return prefs.getString(KEY_SERVER_URL, "https://your-domain.com") ?: "https://your-domain.com"
+            return prefs.getString(KEY_SERVER_URL, "http://192.168.1.11:3000") ?: "http://192.168.1.11:3000"
         }
 
         fun getDeviceToken(context: Context): String? {
@@ -36,31 +35,23 @@ class ApiClient(private val context: Context) {
             return prefs.getString(KEY_DEVICE_TOKEN, null)
         }
 
-        fun getApiKey(context: Context): String? {
-            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            return prefs.getString(KEY_API_KEY, null)
-        }
-
         fun isPaired(context: Context): Boolean {
             val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             return prefs.getBoolean(KEY_IS_PAIRED, false)
         }
 
-        fun sendPaymentEvent(context: Context, payment: ParsedPayment) {
+        fun sendPaymentEvent(context: Context, payment: ParsedPayment, onComplete: ((Boolean) -> Unit)? = null) {
             val token = getDeviceToken(context)
-            val apiKey = getApiKey(context)
-            if (token == null && apiKey == null) return
-
             val serverUrl = getServerUrl(context)
 
             CoroutineScope(Dispatchers.IO).launch {
+                var success = false
                 try {
                     val url = URL("$serverUrl/api/v1/relay/event")
                     val conn = url.openConnection() as HttpURLConnection
                     conn.requestMethod = "POST"
                     conn.setRequestProperty("Content-Type", "application/json")
                     if (token != null) conn.setRequestProperty("x-device-token", token)
-                    if (apiKey != null) conn.setRequestProperty("x-api-key", apiKey)
                     conn.doOutput = true
                     conn.connectTimeout = 12000
                     conn.readTimeout = 12000
@@ -78,17 +69,17 @@ class ApiClient(private val context: Context) {
 
                     val responseCode = conn.responseCode
                     Log.d(TAG, "Payment event sent. Status code: $responseCode")
+                    success = responseCode in 200..299
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to relay payment event", e)
+                } finally {
+                    onComplete?.invoke(success)
                 }
             }
         }
 
         fun sendRawSmsEvent(context: Context, rawMessage: String) {
             val token = getDeviceToken(context)
-            val apiKey = getApiKey(context)
-            if (token == null && apiKey == null) return
-
             val serverUrl = getServerUrl(context)
 
             CoroutineScope(Dispatchers.IO).launch {
@@ -98,7 +89,6 @@ class ApiClient(private val context: Context) {
                     conn.requestMethod = "POST"
                     conn.setRequestProperty("Content-Type", "application/json")
                     if (token != null) conn.setRequestProperty("x-device-token", token)
-                    if (apiKey != null) conn.setRequestProperty("x-api-key", apiKey)
                     conn.doOutput = true
                     conn.connectTimeout = 12000
                     conn.readTimeout = 12000
@@ -119,9 +109,6 @@ class ApiClient(private val context: Context) {
 
         fun sendHeartbeat(context: Context) {
             val token = getDeviceToken(context)
-            val apiKey = getApiKey(context)
-            if (token == null && apiKey == null) return
-
             val serverUrl = getServerUrl(context)
 
             val bm = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
@@ -134,7 +121,6 @@ class ApiClient(private val context: Context) {
                     conn.requestMethod = "POST"
                     conn.setRequestProperty("Content-Type", "application/json")
                     if (token != null) conn.setRequestProperty("x-device-token", token)
-                    if (apiKey != null) conn.setRequestProperty("x-api-key", apiKey)
                     conn.doOutput = true
                     conn.connectTimeout = 8000
                     conn.readTimeout = 8000
@@ -156,13 +142,13 @@ class ApiClient(private val context: Context) {
     data class SyncResult(val success: Boolean, val message: String, val count: Int = 0)
 
     /**
-     * Scan past SMS inbox for 127, CBE, Abyssinia, Awash and sync them to server
+     * Scan past SMS inbox for 127, CBE, Abyssinia, Awash, store locally, and sync them to server
      */
     fun syncInboxSms(): SyncResult {
         return try {
             val serverUrl = getServerUrl(context)
             val token = getDeviceToken(context)
-            val apiKey = getApiKey(context)
+            val store = LocalPaymentStore(context)
 
             val uri = Uri.parse("content://sms/inbox")
             val cursor = context.contentResolver.query(
@@ -174,14 +160,17 @@ class ApiClient(private val context: Context) {
             )
 
             val messagesArray = JSONArray()
+            var localParsedCount = 0
 
             cursor?.use {
                 val addrIdx = it.getColumnIndex("address")
                 val bodyIdx = it.getColumnIndex("body")
+                val dateIdx = it.getColumnIndex("date")
 
                 while (it.moveToNext()) {
                     val address = if (addrIdx >= 0) it.getString(addrIdx) ?: "" else ""
                     val body = if (bodyIdx >= 0) it.getString(bodyIdx) ?: "" else ""
+                    val date = if (dateIdx >= 0) it.getLong(dateIdx) else System.currentTimeMillis()
 
                     val addrLower = address.lowercase()
                     val isBank = address == "127" || addrLower.contains("cbe") || address == "889" ||
@@ -189,6 +178,22 @@ class ApiClient(private val context: Context) {
 
                     val parsed = BankParser.parse(body)
                     if (parsed != null) {
+                        // 1. Save to local on-device store
+                        val stored = StoredPayment(
+                            id = date.toString(),
+                            provider = parsed.provider,
+                            amount = parsed.amount,
+                            currency = parsed.currency,
+                            payerName = parsed.payerName,
+                            payerPhoneOrAcc = parsed.payerPhoneOrAcc,
+                            referenceId = parsed.referenceId,
+                            rawMessage = parsed.rawMessage,
+                            timestamp = date,
+                            isRelayed = false
+                        )
+                        store.savePayment(stored)
+                        localParsedCount++
+
                         val obj = JSONObject().apply {
                             put("provider", parsed.provider)
                             put("amount", parsed.amount)
@@ -216,7 +221,6 @@ class ApiClient(private val context: Context) {
             conn.requestMethod = "POST"
             conn.setRequestProperty("Content-Type", "application/json")
             if (token != null) conn.setRequestProperty("x-device-token", token)
-            if (apiKey != null) conn.setRequestProperty("x-api-key", apiKey)
             conn.doOutput = true
             conn.connectTimeout = 15000
             conn.readTimeout = 15000
@@ -232,9 +236,9 @@ class ApiClient(private val context: Context) {
                 val resp = BufferedReader(InputStreamReader(conn.inputStream)).use { it.readText() }
                 val json = JSONObject(resp)
                 val inserted = json.optInt("insertedCount", 0)
-                SyncResult(true, "Synced $inserted past transactions to server!", inserted)
+                SyncResult(true, "Synced $localParsedCount past transactions ($inserted new on server)!", localParsedCount)
             } else {
-                SyncResult(false, "Server sync returned HTTP $code", 0)
+                SyncResult(true, "Stored $localParsedCount transactions on device (Server sync code: $code).", localParsedCount)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Sync inbox error", e)
@@ -273,9 +277,9 @@ class ApiClient(private val context: Context) {
     }
 
     /**
-     * Pair phone with Chek using 6-Digit PIN or Direct API Key
+     * Pair phone with Chek using 6-Digit PIN
      */
-    fun pair(serverUrl: String, codeOrKey: String): PairResult {
+    fun pair(serverUrl: String, sixDigitPin: String): PairResult {
         val start = System.currentTimeMillis()
         return try {
             val bm = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
@@ -286,8 +290,7 @@ class ApiClient(private val context: Context) {
                 cleanUrl = "http://$cleanUrl"
             }
 
-            val cleanInput = codeOrKey.trim()
-            val isApiKey = cleanInput.startsWith("br_live_")
+            val cleanPin = sixDigitPin.trim().replace(" ", "")
 
             val url = URL("$cleanUrl/api/v1/device/pair")
             val conn = url.openConnection() as HttpURLConnection
@@ -298,11 +301,7 @@ class ApiClient(private val context: Context) {
             conn.readTimeout = 12000
 
             val payload = JSONObject().apply {
-                if (isApiKey) {
-                    put("apiKey", cleanInput)
-                } else {
-                    put("pairingCode", cleanInput.replace(" ", ""))
-                }
+                put("pairingCode", cleanPin)
                 put("deviceName", android.os.Build.MODEL ?: "Android Phone")
                 put("batteryLevel", batteryPct)
             }
@@ -319,16 +318,12 @@ class ApiClient(private val context: Context) {
                 val deviceId = json.optString("deviceId")
 
                 val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-                val editor = prefs.edit()
+                prefs.edit()
                     .putString(KEY_SERVER_URL, cleanUrl)
                     .putString(KEY_DEVICE_TOKEN, deviceToken)
                     .putString(KEY_DEVICE_ID, deviceId)
                     .putBoolean(KEY_IS_PAIRED, true)
-
-                if (isApiKey) {
-                    editor.putString(KEY_API_KEY, cleanInput)
-                }
-                editor.apply()
+                    .apply()
 
                 PairResult(true, "● Paired & Online (${latency}ms)", latency)
             } else {
@@ -348,7 +343,7 @@ class ApiClient(private val context: Context) {
         } catch (e: Exception) {
             val latency = System.currentTimeMillis() - start
             Log.e(TAG, "Pairing network error", e)
-            val msg = e.localizedMessage ?: "Network connection failed. Check your Wi-Fi and Server URL."
+            val msg = e.localizedMessage ?: "Network connection failed. Check your Server URL."
             PairResult(false, msg, latency)
         }
     }

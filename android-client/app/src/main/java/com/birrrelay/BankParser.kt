@@ -29,7 +29,7 @@ object BankParser {
     }
 
     /**
-     * Parse incoming notification/SMS into structured payment event (Odit-compatible)
+     * Parse incoming notification/SMS into structured payment event
      */
     fun parse(rawText: String): ParsedPayment? {
         if (isNonPaymentMessage(rawText)) {
@@ -38,7 +38,7 @@ object BankParser {
 
         val clean = rawText.replace("\\s+".toRegex(), " ").trim()
 
-        // 1. Telebirr P2P, Merchant & QR Payments
+        // 1. Telebirr P2P, Merchant & QR Payments (127 Sender)
         // "You have received ETB 500.00 from ABEBE BIKILA (0911223344) with transaction number CKL9283741 on 2026-08-15. Your current balance is ETB 12,450.00."
         val tbPattern1 = Pattern.compile(
             "You have received ETB\\s*([\\d,.]+)\\s*from\\s*([^(]+?)(?:\\s*\\(([\\d*+\\s]+)\\))?\\s*with transaction (?:number|ID|no)\\s*([A-Z0-9]+)",
@@ -81,10 +81,34 @@ object BankParser {
             )
         }
 
+        // Telebirr Amharic: "ከ 0911223344 (ABEBE BIKILA) 50.00 ብር ደርሶዎታል:: የግብይት ቁጥር CKL9283741"
+        if (clean.contains("ደርሶዎታል") || clean.contains("ግብይት ቁጥር")) {
+            val amPattern = Pattern.compile(
+                "(?:ከ|from)\\s*([\\d*+\\s]+)?(?:\\s*\\(([^)]+)\\))?\\s*([\\d,.]+)\\s*(?:ብር|ETB).*?(?:የግብይት ቁጥር|ቁጥር)[:\\s]*([A-Z0-9]+)",
+                Pattern.CASE_INSENSITIVE
+            )
+            val amMatcher = amPattern.matcher(clean)
+            if (amMatcher.find()) {
+                val phone = amMatcher.group(1)?.trim()
+                val payerName = amMatcher.group(2)?.trim() ?: phone ?: "Telebirr Customer"
+                val amount = amMatcher.group(3)?.replace(",", "")?.toDoubleOrNull() ?: 0.0
+                val refId = amMatcher.group(4)?.trim() ?: return null
+
+                return ParsedPayment(
+                    provider = "TELEBIRR",
+                    amount = amount,
+                    payerName = payerName,
+                    payerPhoneOrAcc = phone,
+                    referenceId = refId,
+                    rawMessage = rawText
+                )
+            }
+        }
+
         // 2. CBE Mobile Banking (1000... 13-digit accounts & FT... references)
         // "Dear customer, your account 1000123456789 has been credited with ETB 1,500.00 by BIRUK TADESSE. Ref: FT242289912039. Current balance is ETB 45,210.00."
         val cbePattern = Pattern.compile(
-            "your (?:account|Account)\\s*([\\d*]+)\\s*has been (?:credited with|Credited with)\\s*ETB\\s*([\\d,.]+).*?(?:by|from)\\s*([^.]+?)\\.\\s*(?:Ref|Txn ID|Reference|Txn)[:\\s]*([A-Z0-9]+)",
+            "your (?:account|Account)\\s*([\\d*]+)\\s*has been (?:credited with|Credited with|credited)\\s*ETB\\s*([\\d,.]+).*?(?:by|from)\\s*([^.]+?)\\.\\s*(?:Ref|Txn ID|Reference|Txn)[:\\s]*([A-Z0-9]+)",
             Pattern.CASE_INSENSITIVE
         )
         val cbeMatcher = cbePattern.matcher(clean)
@@ -104,34 +128,10 @@ object BankParser {
             )
         }
 
-        // 3. Awash Bank Credit Alert (01304... 14-digit accounts)
-        if (clean.contains("awash", ignoreCase = true)) {
-            val awashPattern = Pattern.compile(
-                "account\\s*([\\d*]+)\\s*has been credited with ETB\\s*([\\d,.]+)\\s*by\\s*([^.]+?)\\.\\s*Ref[:\\s]*([A-Z0-9]+)",
-                Pattern.CASE_INSENSITIVE
-            )
-            val awMatcher = awashPattern.matcher(clean)
-            if (awMatcher.find()) {
-                val acc = awMatcher.group(1)?.trim()
-                val amount = awMatcher.group(2)?.replace(",", "")?.toDoubleOrNull() ?: 0.0
-                val payerName = awMatcher.group(3)?.trim() ?: "Awash Customer"
-                val refId = awMatcher.group(4)?.trim() ?: return null
-
-                return ParsedPayment(
-                    provider = "AWASH",
-                    amount = amount,
-                    payerName = payerName,
-                    payerPhoneOrAcc = acc,
-                    referenceId = refId,
-                    rawMessage = rawText
-                )
-            }
-        }
-
-        // 4. Bank of Abyssinia (BOA)
+        // 3. Bank of Abyssinia (BOA)
         if (clean.contains("abyssinia", ignoreCase = true) || clean.contains("boa", ignoreCase = true)) {
             val boaPattern = Pattern.compile(
-                "(?:account|BOA)\\s*([\\d*]+).*?(?:credited with|received)\\s*ETB\\s*([\\d,.]+)\\s*(?:by|from)\\s*([^.]+?)\\.\\s*(?:Ref|Txn)[:\\s]*([A-Z0-9]+)",
+                "(?:account|BOA|Alert:)\\s*([\\d*]+)?.*?(?:credited with|credited|received|has received)\\s*ETB\\s*([\\d,.]+)\\s*(?:by|from)\\s*([^.]+?)\\.\\s*(?:Ref|Txn|Txn ID)[:\\s]*([A-Z0-9]+)",
                 Pattern.CASE_INSENSITIVE
             )
             val boaMatcher = boaPattern.matcher(clean)
@@ -143,6 +143,30 @@ object BankParser {
 
                 return ParsedPayment(
                     provider = "BOA",
+                    amount = amount,
+                    payerName = payerName,
+                    payerPhoneOrAcc = acc,
+                    referenceId = refId,
+                    rawMessage = rawText
+                )
+            }
+        }
+
+        // 4. Awash Bank Credit Alert (01304... 14-digit accounts)
+        if (clean.contains("awash", ignoreCase = true)) {
+            val awashPattern = Pattern.compile(
+                "account\\s*([\\d*]+)\\s*has been (?:credited with|credited)\\s*ETB\\s*([\\d,.]+)\\s*by\\s*([^.]+?)\\.\\s*(?:Ref|Txn)[:\\s]*([A-Z0-9]+)",
+                Pattern.CASE_INSENSITIVE
+            )
+            val awMatcher = awashPattern.matcher(clean)
+            if (awMatcher.find()) {
+                val acc = awMatcher.group(1)?.trim()
+                val amount = awMatcher.group(2)?.replace(",", "")?.toDoubleOrNull() ?: 0.0
+                val payerName = awMatcher.group(3)?.trim() ?: "Awash Customer"
+                val refId = awMatcher.group(4)?.trim() ?: return null
+
+                return ParsedPayment(
+                    provider = "AWASH",
                     amount = amount,
                     payerName = payerName,
                     payerPhoneOrAcc = acc,
@@ -174,6 +198,33 @@ object BankParser {
                     rawMessage = rawText
                 )
             }
+        }
+
+        // 6. Robust Fallback: Any message containing Amount & Reference
+        val amountPattern = Pattern.compile("(?:ETB|ብር)\\s*([\\d,.]+)", Pattern.CASE_INSENSITIVE)
+        val refPattern = Pattern.compile("(?:Ref|Txn|Transaction No|ቁጥር)[:\\s]*([A-Z0-9]{6,})", Pattern.CASE_INSENSITIVE)
+        val amMatch = amountPattern.matcher(clean)
+        val refMatch = refPattern.matcher(clean)
+
+        if (amMatch.find() && refMatch.find()) {
+            val amount = amMatch.group(1)?.replace(",", "")?.toDoubleOrNull() ?: 0.0
+            val refId = refMatch.group(1)?.trim() ?: return null
+
+            val provider = when {
+                refId.startsWith("FT", ignoreCase = true) -> "CBE"
+                refId.startsWith("CKL", ignoreCase = true) || refId.startsWith("TB", ignoreCase = true) -> "TELEBIRR"
+                refId.startsWith("BOA", ignoreCase = true) -> "BOA"
+                refId.startsWith("AW", ignoreCase = true) -> "AWASH"
+                else -> "BANK"
+            }
+
+            return ParsedPayment(
+                provider = provider,
+                amount = amount,
+                payerName = "Bank Customer",
+                referenceId = refId,
+                rawMessage = rawText
+            )
         }
 
         return null
