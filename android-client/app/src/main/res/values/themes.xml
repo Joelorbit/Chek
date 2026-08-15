@@ -1,0 +1,19 @@
+<resources>
+    <!-- Base EyuTheme Dark -->
+    <style name="Theme.BirrRelay" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@color/eyu_canvas_dark</item>
+        <item name="android:navigationBarColor">@color/eyu_canvas_dark</item>
+        <item name="android:windowBackground">@color/eyu_canvas_dark</item>
+        <item name="android:textColorPrimary">@color/eyu_ink_dark</item>
+        <item name="android:colorAccent">@color/eyu_olive_moss</item>
+    </style>
+
+    <!-- Base EyuTheme Light -->
+    <style name="Theme.BirrRelay.Light" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/eyu_canvas_light</item>
+        <item name="android:navigationBarColor">@color/eyu_canvas_light</item>
+        <item name="android:windowBackground">@color/eyu_canvas_light</item>
+        <item name="android:textColorPrimary">@color/eyu_ink_light</item>
+        <item name="android:colorAccent">@color/eyu_olive_moss</item>
+    </style>
+</resources>

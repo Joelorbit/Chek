@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- EyuTheme Base Dark Tokens -->
+    <color name="eyu_canvas_dark">#232323</color>
+    <color name="eyu_surface_dark">#2A2A2A</color>
+    <color name="eyu_surface_elevated_dark">#323232</color>
+    <color name="eyu_surface_pressed_dark">#1A1A1A</color>
+    <color name="eyu_ink_dark">#D3D5D0</color>
+    <color name="eyu_ink_muted_dark">#848580</color>
+
+    <!-- EyuTheme Base Light Tokens -->
+    <color name="eyu_canvas_light">#F5F6F4</color>
+    <color name="eyu_surface_light">#FFFFFF</color>
+    <color name="eyu_surface_elevated_light">#EDEBE7</color>
+    <color name="eyu_surface_pressed_light">#E0DED9</color>
+    <color name="eyu_ink_light">#232323</color>
+    <color name="eyu_ink_muted_light">#6B6B67</color>
+
+    <!-- EyuTheme Core Accents -->
+    <color name="eyu_olive_moss">#5A6237</color>
+    <color name="eyu_olive_strong">#6C7642</color>
+    <color name="eyu_golden_ochre">#B48148</color>
+    <color name="eyu_golden_ochre_light">#CB975B</color>
+    <color name="eyu_terracotta">#7E5026</color>
+    <color name="eyu_sage_cream">#D3D5D0</color>
+
+    <!-- Additional Multi-Theme Presets (from Joelorbit/Mytheme) -->
+    <!-- Cyber Olive -->
+    <color name="cyber_olive_bg">#192017</color>
+    <color name="cyber_olive_accent">#728C34</color>
+    <color name="cyber_olive_lime">#A4C639</color>
+
+    <!-- Emerald Sage -->
+    <color name="emerald_sage_bg">#14201C</color>
+    <color name="emerald_sage_accent">#4EA082</color>
+    <color name="emerald_sage_gold">#C29F53</color>
+
+    <!-- Solar Ochre -->
+    <color name="solar_ochre_bg">#241C16</color>
+    <color name="solar_ochre_accent">#D99B43</color>
+    <color name="solar_ochre_copper">#C86341</color>
+
+    <!-- Indigo Velvet -->
+    <color name="indigo_velvet_bg">#181826</color>
+    <color name="indigo_velvet_accent">#7A6CF0</color>
+    <color name="indigo_velvet_teal">#42B6BD</color>
+
+    <!-- Status -->
+    <color name="eyu_success">#5A6237</color>
+    <color name="eyu_danger">#9E4235</color>
+    <color name="eyu_border">#33D3D5D0</color>
+    <color name="eyu_border_strong">#55D3D5D0</color>
+</resources>
