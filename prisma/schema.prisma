@@ -1,10 +1,10 @@
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -14,19 +14,34 @@ model User {
   name          String?
   apiKey        String         @unique @default(cuid())
   webhookUrl    String?
-  webhookSecret String         @default(cuid())
+  webhookSecret String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+
   devices       Device[]
   transactions  Transaction[]
   webhookLogs   WebhookLog[]
+  checkouts     CheckoutSession[]
+  channels      PaymentChannel[]
+}
+
+model PaymentChannel {
+  id            String    @id @default(cuid())
+  userId        String
+  provider      String    // TELEBIRR, CBE, AWASH, BOA, CBE_BIRR
+  accountNumber String
+  accountName   String
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Device {
   id            String    @id @default(cuid())
   userId        String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  deviceName    String    @default("My Android Phone")
+  deviceName    String    @default("Android Phone")
   deviceToken   String    @unique @default(cuid())
   pairingCode   String?
   codeExpiresAt DateTime?
@@ -35,36 +50,57 @@ model Device {
   lastPingAt    DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Transaction {
-  id           String       @id @default(cuid())
-  userId       String
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  provider     String       // TELEBIRR, CBE, CBE_BIRR, AWASH, BOA
-  amount       Float
-  currency     String       @default("ETB")
-  payerName    String
-  payerPhone   String?
-  referenceId  String       @unique
-  balanceAfter Float?
-  rawMessage   String
-  status       String       @default("VERIFIED") // VERIFIED, DUPLICATE, FAILED
-  createdAt    DateTime     @default(now())
-  webhookLogs  WebhookLog[]
+  id            String    @id @default(cuid())
+  userId        String
+  provider      String    // TELEBIRR, CBE, AWASH, BOA, CBE_BIRR
+  amount        Float
+  currency      String    @default("ETB")
+  payerName     String
+  payerPhone    String?
+  referenceId   String    @unique
+  balanceAfter  Float?
+  rawMessage    String?
+  status        String    @default("VERIFIED") // VERIFIED, PENDING, DUPLICATE
+  checkoutId    String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CheckoutSession {
+  id            String    @id @default(cuid())
+  userId        String
+  title         String
+  amount        Float
+  currency      String    @default("ETB")
+  status        String    @default("PENDING") // PENDING, PAID, EXPIRED
+  customerName  String?
+  customerPhone String?
+  referenceId   String?
+  metadata      String?   // JSON metadata
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model WebhookLog {
-  id             String       @id @default(cuid())
-  userId         String
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactionId  String?
-  transaction    Transaction? @relation(fields: [transactionId], references: [id], onDelete: Cascade)
-  endpoint       String
-  requestPayload String
-  responseStatus Int?
-  responseBody   String?
-  isSuccess      Boolean      @default(false)
-  attempts       Int          @default(1)
-  createdAt      DateTime     @default(now())
+  id            String    @id @default(cuid())
+  userId        String
+  transactionId String?
+  endpoint      String
+  event         String
+  payload       String
+  responseCode  Int?
+  responseBody  String?
+  success       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

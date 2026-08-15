@@ -68,11 +68,11 @@ export async function dispatchWebhook(options: WebhookDispatchOptions) {
       userId,
       transactionId,
       endpoint,
-      requestPayload: payloadString,
-      responseStatus,
+      event: event || "payment.received",
+      payload: payloadString,
+      responseCode: responseStatus,
       responseBody,
-      isSuccess,
-      attempts: 1,
+      success: isSuccess,
     },
   });
 

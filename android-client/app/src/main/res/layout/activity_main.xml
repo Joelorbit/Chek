@@ -1,255 +1,465 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rootLayout"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
     android:background="@color/eyu_canvas_dark">
 
+    <!-- Top App Bar -->
     <LinearLayout
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp"
-        android:gravity="center_horizontal">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="12dp"
+        android:layout_alignParentTop="true">
 
-        <!-- Top Header & Brand -->
+        <ImageView
+            android:id="@+id/ivBrandIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_launcher_foreground"
+            android:layout_marginEnd="10dp" />
+
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="18dp">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:id="@+id/ivBrandIcon"
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
-                    android:src="@drawable/ic_launcher_foreground"
-                    android:layout_marginEnd="10dp" />
-
-                <TextView
-                    android:id="@+id/tvBrandTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Chek"
-                    android:textColor="@color/eyu_ink_dark"
-                    android:textSize="26sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <!-- Theme Toggle Chip -->
-            <Button
-                android:id="@+id/btnThemeToggle"
+            <TextView
+                android:id="@+id/tvAppTitle"
                 android:layout_width="wrap_content"
-                android:layout_height="38dp"
-                android:text="☀️ Light"
-                android:textSize="11sp"
+                android:layout_height="wrap_content"
+                android:text="Chek Gateway"
                 android:textColor="@color/eyu_ink_dark"
-                android:backgroundTint="@color/eyu_surface_elevated_dark" />
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvTopStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="● Companion Relay Active"
+                android:textColor="@color/eyu_olive_moss"
+                android:textSize="10sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Live Status Card -->
+        <TextView
+            android:id="@+id/tvBatteryBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔋 62%"
+            android:textColor="@color/eyu_golden_ochre"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:background="@color/eyu_surface_elevated_dark"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="5dp" />
+    </LinearLayout>
+
+    <!-- Main Scrollable Content Area -->
+    <ScrollView
+        android:id="@+id/contentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/topBar"
+        android:layout_above="@+id/bottomDock"
+        android:fillViewport="true">
+
         <LinearLayout
-            android:id="@+id/statusCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/eyu_surface_dark"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp">
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="24dp">
 
+            <!-- ================= TAB 1: HOME / FEED ================= -->
             <LinearLayout
+                android:id="@+id/tabHomeView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="6dp">
+                android:orientation="vertical"
+                android:visibility="visible">
 
-                <TextView
-                    android:layout_width="0dp"
+                <!-- Volume Summary Card -->
+                <LinearLayout
+                    android:id="@+id/cardVolumeSummary"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="RELAY STATUS"
+                    android:orientation="vertical"
+                    android:background="@color/eyu_surface_dark"
+                    android:padding="18dp"
+                    android:layout_marginBottom="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TODAY'S VERIFIED VOLUME"
+                        android:textColor="@color/eyu_golden_ochre"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.1" />
+
+                    <TextView
+                        android:id="@+id/tvHomeVolume"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0.00 ETB"
+                        android:textColor="@color/eyu_ink_dark"
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="2dp" />
+
+                    <TextView
+                        android:id="@+id/tvHomeCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 payments relayed • 0% gateway cuts"
+                        android:textColor="@color/eyu_ink_muted_dark"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <!-- Live Stream Title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="INTERCEPTED PAYMENT STREAM"
                     android:textColor="@color/eyu_golden_ochre"
                     android:textSize="10sp"
                     android:textStyle="bold"
-                    android:letterSpacing="0.1" />
+                    android:letterSpacing="0.1"
+                    android:layout_marginBottom="8dp" />
 
-                <TextView
-                    android:id="@+id/tvBatteryPct"
-                    android:layout_width="wrap_content"
+                <!-- Payment Feed Card -->
+                <LinearLayout
+                    android:id="@+id/cardFeedStream"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="🔋 --%"
-                    android:textColor="@color/eyu_ink_muted_dark"
-                    android:textSize="10sp"
-                    android:textStyle="bold" />
+                    android:orientation="vertical"
+                    android:background="@color/eyu_surface_dark"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvHomeFeed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Ready and listening for incoming bank SMS &amp; notifications from CBE, Telebirr, and Awash."
+                        android:textColor="@color/eyu_ink_muted_dark"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="3dp" />
+                </LinearLayout>
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="● Ready to connect"
-                android:textColor="@color/eyu_olive_moss"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="6dp" />
-
-            <TextView
-                android:id="@+id/tvPrivacyNotice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🔒 On-Device Privacy Guard: Only incoming credit SMS (CBE, Telebirr, Awash) are parsed. OTPs, 2FA tokens, and personal texts are dropped locally on your phone."
-                android:textColor="@color/eyu_ink_muted_dark"
-                android:textSize="10sp"
-                android:lineSpacingExtra="2dp" />
-
-        </LinearLayout>
-
-        <!-- Main Pairing Card -->
-        <LinearLayout
-            android:id="@+id/mainCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/eyu_surface_dark"
-            android:padding="20dp"
-            android:layout_marginBottom="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SERVER CONNECTION"
-                android:textColor="@color/eyu_golden_ochre"
-                android:textSize="10sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.1"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/tvCardSubtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Connect via Local Wi-Fi or Cloud Tunnel / 4G"
-                android:textColor="@color/eyu_ink_muted_dark"
-                android:textSize="12sp"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Server URL -->
-            <TextView
-                android:id="@+id/tvServerUrlLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Server URL (Wi-Fi IP or Cloud HTTPS URL)"
-                android:textColor="@color/eyu_ink_muted_dark"
-                android:textSize="11sp"
-                android:layout_marginBottom="4dp" />
-
+            <!-- ================= TAB 2: RELAY / ENGINE ================= -->
             <LinearLayout
+                android:id="@+id/tabRelayView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="14dp">
+                android:orientation="vertical"
+                android:visibility="gone">
 
-                <EditText
-                    android:id="@+id/etServerUrl"
-                    android:layout_width="0dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="1"
-                    android:hint="http://192.168.1.11:3000"
-                    android:textColor="@color/eyu_ink_dark"
-                    android:textColorHint="#55848580"
-                    android:background="@color/eyu_surface_pressed_dark"
-                    android:padding="10dp"
-                    android:textSize="13sp" />
+                <LinearLayout
+                    android:id="@+id/cardRelayConfig"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@color/eyu_surface_dark"
+                    android:padding="18dp"
+                    android:layout_marginBottom="14dp">
 
-                <Button
-                    android:id="@+id/btnTestPing"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:text="⚡ Ping"
-                    android:textSize="11sp"
-                    android:textColor="@color/eyu_golden_ochre"
-                    android:backgroundTint="@color/eyu_surface_elevated_dark"
-                    android:layout_marginStart="8dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="GATEWAY SERVER CONNECTION"
+                        android:textColor="@color/eyu_golden_ochre"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="10dp" />
+
+                    <!-- Server URL -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Server URL (Local Wi-Fi or 4G Cloud Tunnel)"
+                        android:textColor="@color/eyu_ink_muted_dark"
+                        android:textSize="11sp"
+                        android:layout_marginBottom="4dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="14dp">
+
+                        <EditText
+                            android:id="@+id/etServerUrl"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:hint="http://192.168.1.11:3000"
+                            android:textColor="@color/eyu_ink_dark"
+                            android:textColorHint="#55848580"
+                            android:background="@color/eyu_surface_pressed_dark"
+                            android:padding="10dp"
+                            android:textSize="13sp" />
+
+                        <Button
+                            android:id="@+id/btnTestPing"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48dp"
+                            android:text="⚡ Ping"
+                            android:textSize="11sp"
+                            android:textColor="@color/eyu_golden_ochre"
+                            android:backgroundTint="@color/eyu_surface_elevated_dark"
+                            android:layout_marginStart="8dp" />
+                    </LinearLayout>
+
+                    <!-- PIN / API Key -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="6-Digit PIN or API Key (br_live_...)"
+                        android:textColor="@color/eyu_ink_muted_dark"
+                        android:textSize="11sp"
+                        android:layout_marginBottom="4dp" />
+
+                    <EditText
+                        android:id="@+id/etPairingCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:hint="PIN or br_live_..."
+                        android:textColor="@color/eyu_golden_ochre"
+                        android:textColorHint="#55848580"
+                        android:background="@color/eyu_surface_pressed_dark"
+                        android:padding="10dp"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Pair Button -->
+                    <Button
+                        android:id="@+id/btnPair"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="Pair &amp; Activate Relay"
+                        android:textColor="@color/eyu_ink_dark"
+                        android:backgroundTint="@color/eyu_olive_moss"
+                        android:textStyle="bold"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <!-- Permissions Status Card -->
+                <LinearLayout
+                    android:id="@+id/cardPermissions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@color/eyu_surface_dark"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RELAY SERVICE PERMISSIONS"
+                        android:textColor="@color/eyu_golden_ochre"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="8dp" />
+
+                    <Button
+                        android:id="@+id/btnGrantNotification"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="✓ Notification Listener Active"
+                        android:textSize="11sp"
+                        android:textColor="@color/eyu_ink_dark"
+                        android:backgroundTint="@color/eyu_surface_elevated_dark"
+                        android:layout_marginBottom="6dp" />
+
+                    <Button
+                        android:id="@+id/btnGrantSms"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:text="✓ SMS Telephony Interceptor Active"
+                        android:textSize="11sp"
+                        android:textColor="@color/eyu_ink_dark"
+                        android:backgroundTint="@color/eyu_surface_elevated_dark" />
+                </LinearLayout>
             </LinearLayout>
 
-            <!-- Pairing PIN or API Key -->
-            <TextView
-                android:id="@+id/tvCodeLabel"
-                android:layout_width="wrap_content"
+            <!-- ================= TAB 3: SETTINGS / LOGS ================= -->
+            <LinearLayout
+                android:id="@+id/tabSettingsView"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="6-Digit PIN or API Key (br_live_...)"
-                android:textColor="@color/eyu_ink_muted_dark"
-                android:textSize="11sp"
-                android:layout_marginBottom="4dp" />
+                android:orientation="vertical"
+                android:visibility="gone">
 
-            <EditText
-                android:id="@+id/etPairingCode"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:hint="PIN or br_live_..."
-                android:textColor="@color/eyu_golden_ochre"
-                android:textColorHint="#55848580"
-                android:background="@color/eyu_surface_pressed_dark"
-                android:padding="10dp"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:layout_marginBottom="18dp" />
+                <!-- Theme Card -->
+                <LinearLayout
+                    android:id="@+id/cardTheme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@color/eyu_surface_dark"
+                    android:padding="16dp"
+                    android:layout_marginBottom="14dp">
 
-            <!-- Pair Button -->
-            <Button
-                android:id="@+id/btnPair"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="Pair &amp; Activate Relay"
-                android:textColor="@color/eyu_ink_dark"
-                android:backgroundTint="@color/eyu_olive_moss"
-                android:textStyle="bold"
-                android:textSize="14sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="APP APPEARANCE"
+                        android:textColor="@color/eyu_golden_ochre"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="8dp" />
+
+                    <Button
+                        android:id="@+id/btnThemeToggle"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:text="☀️ Switch to Crisp White Mode"
+                        android:textSize="12sp"
+                        android:textColor="@color/eyu_ink_dark"
+                        android:backgroundTint="@color/eyu_surface_elevated_dark" />
+                </LinearLayout>
+
+                <!-- Raw Terminal Logs Card -->
+                <LinearLayout
+                    android:id="@+id/cardTerminal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@color/eyu_surface_dark"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="RAW SMS / EVENT TERMINAL"
+                        android:textColor="@color/eyu_golden_ochre"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.1"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvTerminalLogs"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="[Chek Relay Daemon Engine Initialized]\nWaiting for event dispatch..."
+                        android:textColor="@color/eyu_ink_muted_dark"
+                        android:textSize="11sp"
+                        android:fontFamily="monospace"
+                        android:lineSpacingExtra="2dp" />
+                </LinearLayout>
+            </LinearLayout>
 
         </LinearLayout>
+    </ScrollView>
 
-        <!-- Live Activity Log Card -->
+    <!-- ================= FLOATING BOTTOM DOCK NAVIGATION ================= -->
+    <LinearLayout
+        android:id="@+id/bottomDock"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:background="@color/eyu_surface_dark"
+        android:layout_alignParentBottom="true"
+        android:paddingHorizontal="16dp"
+        android:gravity="center_vertical"
+        android:elevation="8dp">
+
+        <!-- Tab 1: Home Button -->
         <LinearLayout
-            android:id="@+id/logCard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/dockTabHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:orientation="vertical"
-            android:background="@color/eyu_surface_dark"
-            android:padding="16dp">
+            android:gravity="center"
+            android:background="?android:attr/selectableItemBackground">
 
             <TextView
+                android:id="@+id/tvDockHomeIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="LIVE PARSED PAYMENTS"
-                android:textColor="@color/eyu_golden_ochre"
-                android:textSize="10sp"
-                android:textStyle="bold"
-                android:letterSpacing="0.1"
-                android:layout_marginBottom="6dp" />
+                android:text="🏠"
+                android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/tvLiveLog"
-                android:layout_width="match_parent"
+                android:id="@+id/tvDockHomeText"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="No transactions intercepted yet.\nSend an SMS or payment to test."
-                android:textColor="@color/eyu_ink_muted_dark"
+                android:text="Home"
+                android:textColor="@color/eyu_olive_moss"
                 android:textSize="11sp"
-                android:fontFamily="monospace"
-                android:lineSpacingExtra="2dp" />
-
+                android:textStyle="bold" />
         </LinearLayout>
 
+        <!-- Tab 2: Relay Button -->
+        <LinearLayout
+            android:id="@+id/dockTabRelay"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="?android:attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/tvDockRelayIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚡"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvDockRelayText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Relay"
+                android:textColor="@color/eyu_ink_muted_dark"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Tab 3: Settings Button -->
+        <LinearLayout
+            android:id="@+id/dockTabSettings"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="?android:attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/tvDockSettingsIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚙️"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvDockSettingsText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textColor="@color/eyu_ink_muted_dark"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
-</ScrollView>
+
+</RelativeLayout>

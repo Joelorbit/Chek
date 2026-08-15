@@ -8,6 +8,7 @@ import {
   WebhooksLogo,
   BookBookmark,
   SquaresFour,
+  CreditCard,
 } from "@phosphor-icons/react";
 import { ThemeToggle } from "./theme-provider";
 import { BrandLogo } from "./brand-logo";
@@ -46,6 +47,17 @@ export function Navbar() {
               >
                 <SquaresFour size={16} weight="duotone" className="text-[var(--accent)]" />
                 Live Feed
+              </Link>
+              <Link
+                href="/dashboard/channels"
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-eyu text-xs font-medium transition-colors ${
+                  pathname === "/dashboard/channels"
+                    ? "bg-[var(--surface-elevated)] text-[var(--ink)] border border-[var(--line-strong)] font-semibold"
+                    : "text-[var(--text-muted)] hover:text-[var(--ink)] hover:bg-[var(--surface)]"
+                }`}
+              >
+                <CreditCard size={16} weight="duotone" className="text-[var(--complement)]" />
+                Payment Links
               </Link>
               <Link
                 href="/dashboard/devices"

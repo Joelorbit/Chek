@@ -114,7 +114,7 @@ export async function POST(req: NextRequest) {
         userId,
         transactionId: transaction.id,
         endpoint: user.webhookUrl,
-        secret: user.webhookSecret,
+        secret: user.webhookSecret || "whsec_default",
         event: "payment.received",
         data: {
           id: transaction.id,
