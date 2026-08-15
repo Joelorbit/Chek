@@ -154,24 +154,20 @@ This log file tracks every action, file creation, code edit, and test execution 
 
 ---
 
-## Phase 16: Odit-Grade Payment Gateway & Android Bottom Dock Overhaul — 2026-08-15 23:18:00 (COMPLETED)
+## Phase 17: Historical SMS Inbox Sync & Instant Reconcile Engine — 2026-08-15 23:27:00 (COMPLETED)
 
-* **Odit Gateway Engine Built**:
-  * **Hosted Payment Links & Checkout**: `/pay/[id]` where customers select Telebirr/CBE, copy receiver details, input reference number (`FT...` / `CKL...`), and receive instant verified confirmation.
-  * **Gateway API Routes**:
-    * `POST /api/v1/checkout/create`: Creates hosted payment session.
-    * `GET /api/v1/checkout/[id]`: Returns checkout details + active receiving bank accounts.
-    * `POST /api/v1/checkout/verify`: Reconciles transaction against banking network in real time.
-    * `GET` & `POST /api/v1/channels`: Manages developer personal receiving accounts (Telebirr, CBE, Awash, BOA).
-* **Android Companion App Redesign**:
-  * **Bottom Floating Dock Navigation**:
-    * 🏠 **Home / Feed**: Daily verified volume ticker, payments relayed counter, real-time transaction stream.
-    * ⚡ **Relay / Engine**: Server URL, 6-digit PIN / API Key pairing, ⚡ Ping latency tester, live permission status chips.
-    * ⚙️ **Settings / Logs**: EyuTheme Charcoal Dark / Crisp White mode switcher, raw SMS terminal log.
+* **Historical SMS Inbox Sync Engine**:
+  * **On-Device Sync (`ApiClient.kt` & `MainActivity.kt`)**: Added `syncInboxSms()` to scan the phone's SMS inbox (`content://sms/inbox`) for past messages from `127` (Telebirr), `CBE`, `Abyssinia`, and `Awash`.
+  * Parses past receipts into JSON and sends them in a single batch to `/api/v1/relay/batch`.
+  * **One-Click UI Trigger**: Added **"🔄 Sync Past Bank SMS Inbox"** button to the Android app and automatic sync on initial pairing.
+* **Server Batch Ingestion (`/api/v1/relay/batch`)**:
+  * Idempotent batch insertion checking `referenceId` uniqueness.
+  * Ensures any payment made while the phone was rebooting or before app install is instantly indexed.
 * **Verification & CI**:
   * `npx vitest run`: **16 / 16 tests passing (100%)**.
-  * `npx next build`: **23 / 23 static & dynamic routes compiled with 0 errors**.
+  * `npx next build`: **24 / 24 routes compiled with 0 errors**.
   * Pushed to [`github.com/Joelorbit/Chek`](https://github.com/Joelorbit/Chek).
+
 
 
 
