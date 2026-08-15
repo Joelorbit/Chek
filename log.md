@@ -150,15 +150,27 @@ This log file tracks every action, file creation, code edit, and test execution 
 
 ---
 
-## Phase 13: AndroidX Gradle Configuration & GitHub Actions CI Fix — 2026-08-15 20:51:00 (COMPLETED)
+---
 
-* **AndroidX Configuration Added**:
-  * Created [`android-client/gradle.properties`](file:///home/latexjo/Projects/underdev/verify/android-client/gradle.properties) with `android.useAndroidX=true` and `android.enableJetifier=true`.
-* **CI Workflow Hardened**:
-  * Updated [`.github/workflows/build-apk.yml`](file:///home/latexjo/Projects/underdev/verify/.github/workflows/build-apk.yml) with official Gradle 8.5 LTS setup.
-  * Configured artifact upload for **`Chek-APK`** generating `Chek-v1.0.apk`.
-* **GitHub Push**:
+## Phase 14: System Redesign: Dual-Mode Pairing (6-Digit PIN & Direct API Key) + Live Ping Diagnostic — 2026-08-15 22:05:00 (COMPLETED)
+
+* **Redesigned Device Handshake Engine (`/api/v1/device/pair`)**:
+  * Added **Dual Pairing Modes**:
+    1. **Mode 1: 6-Digit PIN** (extended 60-minute window with auto-created fallbacks).
+    2. **Mode 2: Direct API Key** (`br_live_...`) — instant pairing with zero expiration hassles.
+  * Added universal CORS preflight (`OPTIONS`) handling.
+* **Redesigned Android Client (`MainActivity.kt` & `ApiClient.kt`)**:
+  * Added **⚡ Live Ping Test** button to test server reachability and millisecond latency before pairing.
+  * Increased connect and read timeouts to 12,000ms.
+  * Enhanced error diagnostics to report exact HTTP status codes and detailed failure reasons.
+* **Dashboard Devices Page Enhanced (`/dashboard/devices`)**:
+  * Displays both **6-Digit PIN** and **Direct API Key** copy buttons.
+  * Added real-time device refresh button.
+* **Verification & CI**:
+  * `npx vitest run`: **16 / 16 tests passing (100%)**.
+  * `npx next build`: **19 routes compiled with 0 errors**.
   * Pushed to [`github.com/Joelorbit/Chek`](https://github.com/Joelorbit/Chek).
+
 
 
 
