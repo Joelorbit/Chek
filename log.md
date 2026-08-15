@@ -154,21 +154,25 @@ This log file tracks every action, file creation, code edit, and test execution 
 
 ---
 
-## Phase 15: Clean Slate Reset & Odit-Grade Engine Initialized — 2026-08-15 22:52:00 (COMPLETED)
+## Phase 16: Odit-Grade Payment Gateway & Android Bottom Dock Overhaul — 2026-08-15 23:18:00 (COMPLETED)
 
-* **Database Location**: [`prisma/dev.db`](file:///home/latexjo/Projects/underdev/verify/prisma/dev.db) (SQLite database managed via Prisma ORM [`prisma/schema.prisma`](file:///home/latexjo/Projects/underdev/verify/prisma/schema.prisma)).
-* **Clean Slate Applied**:
-  * Wiped all legacy mock transactions, test users, and old pairing entries.
-  * Initialized fresh primary developer workspace: `developer@chek.et`.
-  * Dashboard reset to clean 0.00 ETB state ready for real production usage.
-* **Android Client Hardened**:
-  * Direct SMS telephony interception (`SmsReceiver.kt`) + system notification listener (`NotificationListener.kt`).
-  * On-device live JSON parsed logs stream.
-  * EyuTheme dark/white mode.
-* **Verification**:
+* **Odit Gateway Engine Built**:
+  * **Hosted Payment Links & Checkout**: `/pay/[id]` where customers select Telebirr/CBE, copy receiver details, input reference number (`FT...` / `CKL...`), and receive instant verified confirmation.
+  * **Gateway API Routes**:
+    * `POST /api/v1/checkout/create`: Creates hosted payment session.
+    * `GET /api/v1/checkout/[id]`: Returns checkout details + active receiving bank accounts.
+    * `POST /api/v1/checkout/verify`: Reconciles transaction against banking network in real time.
+    * `GET` & `POST /api/v1/channels`: Manages developer personal receiving accounts (Telebirr, CBE, Awash, BOA).
+* **Android Companion App Redesign**:
+  * **Bottom Floating Dock Navigation**:
+    * 🏠 **Home / Feed**: Daily verified volume ticker, payments relayed counter, real-time transaction stream.
+    * ⚡ **Relay / Engine**: Server URL, 6-digit PIN / API Key pairing, ⚡ Ping latency tester, live permission status chips.
+    * ⚙️ **Settings / Logs**: EyuTheme Charcoal Dark / Crisp White mode switcher, raw SMS terminal log.
+* **Verification & CI**:
   * `npx vitest run`: **16 / 16 tests passing (100%)**.
-  * `npx next build`: **19 routes compiled with 0 errors**.
+  * `npx next build`: **23 / 23 static & dynamic routes compiled with 0 errors**.
   * Pushed to [`github.com/Joelorbit/Chek`](https://github.com/Joelorbit/Chek).
+
 
 
 
