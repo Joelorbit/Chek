@@ -51,6 +51,7 @@ class MainActivity : Activity() {
     private lateinit var tvHomeVolume: TextView
     private lateinit var tvHomeCount: TextView
     private lateinit var tvHomeFeed: TextView
+    private lateinit var btnSyncPastSms: Button
     private lateinit var cardVolumeSummary: LinearLayout
     private lateinit var cardFeedStream: LinearLayout
 
@@ -118,6 +119,7 @@ class MainActivity : Activity() {
         tvHomeVolume = findViewById(R.id.tvHomeVolume)
         tvHomeCount = findViewById(R.id.tvHomeCount)
         tvHomeFeed = findViewById(R.id.tvHomeFeed)
+        btnSyncPastSms = findViewById(R.id.btnSyncPastSms)
         cardVolumeSummary = findViewById(R.id.cardVolumeSummary)
         cardFeedStream = findViewById(R.id.cardFeedStream)
 
@@ -199,6 +201,27 @@ class MainActivity : Activity() {
             }
 
             pairDevice(server, codeOrKey)
+        }
+
+        btnSyncPastSms.setOnClickListener {
+            syncPastInboxSms()
+        }
+    }
+
+    private fun syncPastInboxSms() {
+        btnSyncPastSms.isEnabled = false
+        btnSyncPastSms.text = "⏳ Syncing SMS Inbox..."
+
+        CoroutineScope(Dispatchers.IO).launch {
+            val apiClient = ApiClient(this@MainActivity)
+            val result = apiClient.syncInboxSms()
+
+            withContext(Dispatchers.Main) {
+                btnSyncPastSms.isEnabled = true
+                btnSyncPastSms.text = "🔄 Sync Past Bank SMS Inbox"
+                Toast.makeText(this@MainActivity, result.message, Toast.LENGTH_LONG).show()
+                tvTerminalLogs.text = "[${System.currentTimeMillis()}] ${result.message}\n${tvTerminalLogs.text}"
+            }
         }
     }
 
@@ -290,6 +313,8 @@ class MainActivity : Activity() {
                     tvTopStatus.setTextColor(Color.parseColor("#5A6237"))
                     Toast.makeText(this@MainActivity, "Connected & Paired Successfully!", Toast.LENGTH_SHORT).show()
                     switchTab(0)
+                    // Auto sync past SMS inbox on pairing
+                    syncPastInboxSms()
                 } else {
                     tvTopStatus.text = "✕ Pairing Failed"
                     tvTopStatus.setTextColor(Color.parseColor("#9E4235"))

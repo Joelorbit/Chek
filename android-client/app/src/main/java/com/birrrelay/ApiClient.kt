@@ -1,11 +1,13 @@
 package com.birrrelay
 
 import android.content.Context
+import android.net.Uri
 import android.os.BatteryManager
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -76,6 +78,12 @@ class ApiClient(private val context: Context) {
 
                     val responseCode = conn.responseCode
                     Log.d(TAG, "Payment event sent. Status code: $responseCode")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to relay payment event", e)
+                }
+            }
+        }
+
         fun sendRawSmsEvent(context: Context, rawMessage: String) {
             val token = getDeviceToken(context)
             val apiKey = getApiKey(context)
@@ -145,6 +153,94 @@ class ApiClient(private val context: Context) {
     }
 
     data class PairResult(val success: Boolean, val message: String, val latencyMs: Long = 0)
+    data class SyncResult(val success: Boolean, val message: String, val count: Int = 0)
+
+    /**
+     * Scan past SMS inbox for 127, CBE, Abyssinia, Awash and sync them to server
+     */
+    fun syncInboxSms(): SyncResult {
+        return try {
+            val serverUrl = getServerUrl(context)
+            val token = getDeviceToken(context)
+            val apiKey = getApiKey(context)
+
+            val uri = Uri.parse("content://sms/inbox")
+            val cursor = context.contentResolver.query(
+                uri,
+                arrayOf("address", "body", "date"),
+                null,
+                null,
+                "date DESC LIMIT 100"
+            )
+
+            val messagesArray = JSONArray()
+
+            cursor?.use {
+                val addrIdx = it.getColumnIndex("address")
+                val bodyIdx = it.getColumnIndex("body")
+
+                while (it.moveToNext()) {
+                    val address = if (addrIdx >= 0) it.getString(addrIdx) ?: "" else ""
+                    val body = if (bodyIdx >= 0) it.getString(bodyIdx) ?: "" else ""
+
+                    val addrLower = address.lowercase()
+                    val isBank = address == "127" || addrLower.contains("cbe") || address == "889" ||
+                            addrLower.contains("abyssinia") || addrLower.contains("boa") || addrLower.contains("awash")
+
+                    val parsed = BankParser.parse(body)
+                    if (parsed != null) {
+                        val obj = JSONObject().apply {
+                            put("provider", parsed.provider)
+                            put("amount", parsed.amount)
+                            put("payerName", parsed.payerName)
+                            put("payerPhone", parsed.payerPhoneOrAcc)
+                            put("referenceId", parsed.referenceId)
+                            put("rawMessage", parsed.rawMessage)
+                        }
+                        messagesArray.put(obj)
+                    } else if (isBank && !BankParser.isNonPaymentMessage(body)) {
+                        val obj = JSONObject().apply {
+                            put("rawMessage", body)
+                        }
+                        messagesArray.put(obj)
+                    }
+                }
+            }
+
+            if (messagesArray.length() == 0) {
+                return SyncResult(true, "No bank SMS found in inbox to sync.", 0)
+            }
+
+            val url = URL("$serverUrl/api/v1/relay/batch")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.requestMethod = "POST"
+            conn.setRequestProperty("Content-Type", "application/json")
+            if (token != null) conn.setRequestProperty("x-device-token", token)
+            if (apiKey != null) conn.setRequestProperty("x-api-key", apiKey)
+            conn.doOutput = true
+            conn.connectTimeout = 15000
+            conn.readTimeout = 15000
+
+            val payload = JSONObject().apply {
+                put("messages", messagesArray)
+            }
+
+            OutputStreamWriter(conn.outputStream).use { it.write(payload.toString()) }
+
+            val code = conn.responseCode
+            if (code in 200..299) {
+                val resp = BufferedReader(InputStreamReader(conn.inputStream)).use { it.readText() }
+                val json = JSONObject(resp)
+                val inserted = json.optInt("insertedCount", 0)
+                SyncResult(true, "Synced $inserted past transactions to server!", inserted)
+            } else {
+                SyncResult(false, "Server sync returned HTTP $code", 0)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Sync inbox error", e)
+            SyncResult(false, e.localizedMessage ?: "Sync failed", 0)
+        }
+    }
 
     /**
      * Test reachability and ping the Chek server

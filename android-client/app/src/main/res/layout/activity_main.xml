@@ -125,6 +125,18 @@
                         android:textSize="11sp" />
                 </LinearLayout>
 
+                <!-- Sync Past SMS Action Button -->
+                <Button
+                    android:id="@+id/btnSyncPastSms"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:text="🔄 Sync Past Bank SMS Inbox"
+                    android:textSize="12sp"
+                    android:textColor="@color/eyu_golden_ochre"
+                    android:backgroundTint="@color/eyu_surface_elevated_dark"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="14dp" />
+
                 <!-- Live Stream Title -->
                 <TextView
                     android:layout_width="wrap_content"
