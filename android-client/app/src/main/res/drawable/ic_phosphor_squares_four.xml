@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="256"
+    android:viewportHeight="256">
+    <!-- Duotone Soft Fills -->
+    <path
+        android:fillColor="#335A6237"
+        android:pathData="M104,48H56A16,16 0 0,0 40,64v48a16,16 0 0,0 16,16h48a16,16 0 0,0 16,-16V64A16,16 0 0,0 104,48Zm96,0H152a16,16 0 0,0 -16,16v48a16,16 0 0,0 16,16h48a16,16 0 0,0 16,-16V64A16,16 0 0,0 200,48Zm-96,96H56a16,16 0 0,0 -16,16v48a16,16 0 0,0 16,16h48a16,16 0 0,0 16,-16V160A16,16 0 0,0 104,144Zm96,0H152a16,16 0 0,0 -16,16v48a16,16 0 0,0 16,16h48a16,16 0 0,0 16,-16V160A16,16 0 0,0 200,144Z" />
+    <!-- Duotone Stroke Outlines -->
+    <path
+        android:strokeColor="#5A6237"
+        android:strokeWidth="16"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M104,48H56A16,16 0 0,0 40,64v48a16,16 0 0,0 16,16h48a16,16 0 0,0 16,-16V64A16,16 0 0,0 104,48Zm96,0H152a16,16 0 0,0 -16,16v48a16,16 0 0,0 16,16h48a16,16 0 0,0 16,-16V64A16,16 0 0,0 200,48Zm-96,96H56a16,16 0 0,0 -16,16v48a16,16 0 0,0 16,16h48a16,16 0 0,0 16,-16V160A16,16 0 0,0 104,144Zm96,0H152a16,16 0 0,0 -16,16v48a16,16 0 0,0 16,16h48a16,16 0 0,0 16,-16V160A16,16 0 0,0 200,144Z" />
+</vector>

@@ -328,34 +328,36 @@ class MainActivity : Activity() {
         if (isDarkMode) {
             rootContainer.setBackgroundColor(Color.parseColor("#232323"))
             topBar.setBackgroundColor(Color.parseColor("#232323"))
-            bottomDock.setBackgroundColor(Color.parseColor("#2A2A2A"))
+            bottomDock.setBackgroundResource(R.drawable.dock_rounded_dark)
 
-            cardVolumeSummary.setBackgroundColor(Color.parseColor("#2A2A2A"))
-            cardFeedStream.setBackgroundColor(Color.parseColor("#2A2A2A"))
-            cardRelayConfig.setBackgroundColor(Color.parseColor("#2A2A2A"))
-            cardPermissions.setBackgroundColor(Color.parseColor("#2A2A2A"))
-            cardTheme.setBackgroundColor(Color.parseColor("#2A2A2A"))
-            cardTerminal.setBackgroundColor(Color.parseColor("#2A2A2A"))
+            cardVolumeSummary.setBackgroundResource(R.drawable.card_rounded_dark)
+            cardFeedStream.setBackgroundResource(R.drawable.card_rounded_dark)
+            cardRelayConfig.setBackgroundResource(R.drawable.card_rounded_dark)
+            cardPermissions.setBackgroundResource(R.drawable.card_rounded_dark)
+            cardTheme.setBackgroundResource(R.drawable.card_rounded_dark)
+            cardTerminal.setBackgroundResource(R.drawable.card_rounded_dark)
 
             tvAppTitle.setTextColor(Color.parseColor("#D3D5D0"))
-            btnThemeToggle.text = "☀️ Switch to Crisp White Mode"
+            tvHomeVolume.setTextColor(Color.parseColor("#D3D5D0"))
+            btnThemeToggle.text = "Switch to Crisp White Mode"
             btnThemeToggle.setTextColor(Color.parseColor("#D3D5D0"))
             btnThemeToggle.setBackgroundColor(Color.parseColor("#323232"))
             window.statusBarColor = Color.parseColor("#232323")
         } else {
             rootContainer.setBackgroundColor(Color.parseColor("#F5F6F4"))
             topBar.setBackgroundColor(Color.parseColor("#F5F6F4"))
-            bottomDock.setBackgroundColor(Color.parseColor("#FFFFFF"))
+            bottomDock.setBackgroundResource(R.drawable.dock_rounded_light)
 
-            cardVolumeSummary.setBackgroundColor(Color.parseColor("#FFFFFF"))
-            cardFeedStream.setBackgroundColor(Color.parseColor("#FFFFFF"))
-            cardRelayConfig.setBackgroundColor(Color.parseColor("#FFFFFF"))
-            cardPermissions.setBackgroundColor(Color.parseColor("#FFFFFF"))
-            cardTheme.setBackgroundColor(Color.parseColor("#FFFFFF"))
-            cardTerminal.setBackgroundColor(Color.parseColor("#FFFFFF"))
+            cardVolumeSummary.setBackgroundResource(R.drawable.card_rounded_light)
+            cardFeedStream.setBackgroundResource(R.drawable.card_rounded_light)
+            cardRelayConfig.setBackgroundResource(R.drawable.card_rounded_light)
+            cardPermissions.setBackgroundResource(R.drawable.card_rounded_light)
+            cardTheme.setBackgroundResource(R.drawable.card_rounded_light)
+            cardTerminal.setBackgroundResource(R.drawable.card_rounded_light)
 
             tvAppTitle.setTextColor(Color.parseColor("#232323"))
-            btnThemeToggle.text = "🌙 Switch to Charcoal Dark Mode"
+            tvHomeVolume.setTextColor(Color.parseColor("#232323"))
+            btnThemeToggle.text = "Switch to Charcoal Dark Mode"
             btnThemeToggle.setTextColor(Color.parseColor("#232323"))
             btnThemeToggle.setBackgroundColor(Color.parseColor("#EAEAEA"))
             window.statusBarColor = Color.parseColor("#F5F6F4")

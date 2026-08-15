@@ -13,16 +13,16 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingHorizontal="20dp"
-        android:paddingTop="16dp"
+        android:paddingTop="18dp"
         android:paddingBottom="12dp"
         android:layout_alignParentTop="true">
 
         <ImageView
             android:id="@+id/ivBrandIcon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
             android:src="@drawable/ic_launcher_foreground"
-            android:layout_marginEnd="10dp" />
+            android:layout_marginEnd="12dp" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -34,9 +34,9 @@
                 android:id="@+id/tvAppTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Chek Gateway"
+                android:text="Chek"
                 android:textColor="@color/eyu_ink_dark"
-                android:textSize="20sp"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -53,11 +53,11 @@
             android:id="@+id/tvBatteryBadge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🔋 62%"
+            android:text="62%"
             android:textColor="@color/eyu_golden_ochre"
             android:textSize="11sp"
             android:textStyle="bold"
-            android:background="@color/eyu_surface_elevated_dark"
+            android:background="@drawable/card_rounded_dark"
             android:paddingHorizontal="10dp"
             android:paddingVertical="5dp" />
     </LinearLayout>
@@ -92,8 +92,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="@color/eyu_surface_dark"
-                    android:padding="18dp"
+                    android:background="@drawable/card_rounded_dark"
+                    android:padding="20dp"
                     android:layout_marginBottom="14dp">
 
                     <TextView
@@ -111,7 +111,7 @@
                         android:layout_height="wrap_content"
                         android:text="0.00 ETB"
                         android:textColor="@color/eyu_ink_dark"
-                        android:textSize="26sp"
+                        android:textSize="28sp"
                         android:textStyle="bold"
                         android:layout_marginTop="4dp"
                         android:layout_marginBottom="2dp" />
@@ -129,13 +129,13 @@
                 <Button
                     android:id="@+id/btnSyncPastSms"
                     android:layout_width="match_parent"
-                    android:layout_height="44dp"
-                    android:text="🔄 Sync Past Bank SMS Inbox"
+                    android:layout_height="46dp"
+                    android:text="Sync Past Bank SMS Inbox"
                     android:textSize="12sp"
                     android:textColor="@color/eyu_golden_ochre"
                     android:backgroundTint="@color/eyu_surface_elevated_dark"
                     android:textStyle="bold"
-                    android:layout_marginBottom="14dp" />
+                    android:layout_marginBottom="16dp" />
 
                 <!-- Live Stream Title -->
                 <TextView
@@ -154,14 +154,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="@color/eyu_surface_dark"
+                    android:background="@drawable/card_rounded_dark"
                     android:padding="16dp">
 
                     <TextView
                         android:id="@+id/tvHomeFeed"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Ready and listening for incoming bank SMS &amp; notifications from CBE, Telebirr, and Awash."
+                        android:text="Ready and listening for incoming bank SMS &amp; notifications from CBE, 127 (Telebirr), Abyssinia, and Awash."
                         android:textColor="@color/eyu_ink_muted_dark"
                         android:textSize="12sp"
                         android:lineSpacingExtra="3dp" />
@@ -181,8 +181,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="@color/eyu_surface_dark"
-                    android:padding="18dp"
+                    android:background="@drawable/card_rounded_dark"
+                    android:padding="20dp"
                     android:layout_marginBottom="14dp">
 
                     <TextView
@@ -193,7 +193,7 @@
                         android:textSize="10sp"
                         android:textStyle="bold"
                         android:letterSpacing="0.1"
-                        android:layout_marginBottom="10dp" />
+                        android:layout_marginBottom="12dp" />
 
                     <!-- Server URL -->
                     <TextView
@@ -226,7 +226,7 @@
                             android:id="@+id/btnTestPing"
                             android:layout_width="wrap_content"
                             android:layout_height="48dp"
-                            android:text="⚡ Ping"
+                            android:text="Ping"
                             android:textSize="11sp"
                             android:textColor="@color/eyu_golden_ochre"
                             android:backgroundTint="@color/eyu_surface_elevated_dark"
@@ -274,7 +274,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="@color/eyu_surface_dark"
+                    android:background="@drawable/card_rounded_dark"
                     android:padding="16dp">
 
                     <TextView
@@ -291,7 +291,7 @@
                         android:id="@+id/btnGrantNotification"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:text="✓ Notification Listener Active"
+                        android:text="Notification Listener Active"
                         android:textSize="11sp"
                         android:textColor="@color/eyu_ink_dark"
                         android:backgroundTint="@color/eyu_surface_elevated_dark"
@@ -301,7 +301,7 @@
                         android:id="@+id/btnGrantSms"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:text="✓ SMS Telephony Interceptor Active"
+                        android:text="SMS Telephony Interceptor Active"
                         android:textSize="11sp"
                         android:textColor="@color/eyu_ink_dark"
                         android:backgroundTint="@color/eyu_surface_elevated_dark" />
@@ -322,7 +322,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="@color/eyu_surface_dark"
+                    android:background="@drawable/card_rounded_dark"
                     android:padding="16dp"
                     android:layout_marginBottom="14dp">
 
@@ -340,7 +340,7 @@
                         android:id="@+id/btnThemeToggle"
                         android:layout_width="match_parent"
                         android:layout_height="44dp"
-                        android:text="☀️ Switch to Crisp White Mode"
+                        android:text="Switch to Crisp White Mode"
                         android:textSize="12sp"
                         android:textColor="@color/eyu_ink_dark"
                         android:backgroundTint="@color/eyu_surface_elevated_dark" />
@@ -352,7 +352,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="@color/eyu_surface_dark"
+                    android:background="@drawable/card_rounded_dark"
                     android:padding="16dp">
 
                     <TextView
@@ -369,7 +369,7 @@
                         android:id="@+id/tvTerminalLogs"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="[Chek Relay Daemon Engine Initialized]\nWaiting for event dispatch..."
+                        android:text="[Chek Relay Daemon Initialized]\nWaiting for event dispatch..."
                         android:textColor="@color/eyu_ink_muted_dark"
                         android:textSize="11sp"
                         android:fontFamily="monospace"
@@ -386,11 +386,11 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:orientation="horizontal"
-        android:background="@color/eyu_surface_dark"
+        android:background="@drawable/dock_rounded_dark"
         android:layout_alignParentBottom="true"
         android:paddingHorizontal="16dp"
         android:gravity="center_vertical"
-        android:elevation="8dp">
+        android:elevation="12dp">
 
         <!-- Tab 1: Home Button -->
         <LinearLayout
@@ -402,21 +402,21 @@
             android:gravity="center"
             android:background="?android:attr/selectableItemBackground">
 
-            <TextView
-                android:id="@+id/tvDockHomeIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🏠"
-                android:textSize="16sp" />
+            <ImageView
+                android:id="@+id/ivDockHomeIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_phosphor_squares_four" />
 
             <TextView
                 android:id="@+id/tvDockHomeText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Home"
+                android:text="Live Feed"
                 android:textColor="@color/eyu_olive_moss"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:layout_marginTop="2dp" />
         </LinearLayout>
 
         <!-- Tab 2: Relay Button -->
@@ -429,12 +429,11 @@
             android:gravity="center"
             android:background="?android:attr/selectableItemBackground">
 
-            <TextView
-                android:id="@+id/tvDockRelayIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⚡"
-                android:textSize="16sp" />
+            <ImageView
+                android:id="@+id/ivDockRelayIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_phosphor_lightning" />
 
             <TextView
                 android:id="@+id/tvDockRelayText"
@@ -442,8 +441,9 @@
                 android:layout_height="wrap_content"
                 android:text="Relay"
                 android:textColor="@color/eyu_ink_muted_dark"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:layout_marginTop="2dp" />
         </LinearLayout>
 
         <!-- Tab 3: Settings Button -->
@@ -456,21 +456,21 @@
             android:gravity="center"
             android:background="?android:attr/selectableItemBackground">
 
-            <TextView
-                android:id="@+id/tvDockSettingsIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="⚙️"
-                android:textSize="16sp" />
+            <ImageView
+                android:id="@+id/ivDockSettingsIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_phosphor_gear" />
 
             <TextView
                 android:id="@+id/tvDockSettingsText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Settings"
+                android:text="Console"
                 android:textColor="@color/eyu_ink_muted_dark"
-                android:textSize="11sp"
-                android:textStyle="bold" />
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:layout_marginTop="2dp" />
         </LinearLayout>
     </LinearLayout>
 
