@@ -12,7 +12,7 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="BirrRelay"
+        android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BirrRelay">
@@ -30,7 +30,7 @@
         <!-- Safe Notification Listener Service (CBE & Telebirr) -->
         <service
             android:name=".NotificationListener"
-            android:label="BirrRelay Bank Notification Service"
+            android:label="Chek Bank Notification Service"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
             android:exported="true">
             <intent-filter>

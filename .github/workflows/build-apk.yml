@@ -1,4 +1,4 @@
-name: Build BirrRelay Android APK
+name: Build Chek Android APK
 
 on:
   push:
@@ -22,15 +22,23 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Build APK with Gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.5'
+
+      - name: Build Chek APK
         working-directory: ./android-client
         run: |
-          gradle wrapper
-          ./gradlew assembleDebug --stacktrace
+          gradle assembleDebug --stacktrace
+          mkdir -p build-outputs
+          cp app/build/outputs/apk/debug/*.apk build-outputs/Chek-v1.0.apk || true
 
-      - name: Upload APK Artifact
+      - name: Upload Chek APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: BirrRelay-Debug-APK
-          path: android-client/app/build/outputs/apk/debug/*.apk
-          retention-days: 14
+          name: Chek-APK
+          path: |
+            android-client/build-outputs/Chek-v1.0.apk
+            android-client/app/build/outputs/apk/debug/*.apk
+          retention-days: 30
