@@ -1,0 +1,70 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  email         String         @unique
+  password      String
+  name          String?
+  apiKey        String         @unique @default(cuid())
+  webhookUrl    String?
+  webhookSecret String         @default(cuid())
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  devices       Device[]
+  transactions  Transaction[]
+  webhookLogs   WebhookLog[]
+}
+
+model Device {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceName    String    @default("My Android Phone")
+  deviceToken   String    @unique @default(cuid())
+  pairingCode   String?
+  codeExpiresAt DateTime?
+  batteryLevel  Int       @default(100)
+  isOnline      Boolean   @default(false)
+  lastPingAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Transaction {
+  id           String       @id @default(cuid())
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider     String       // TELEBIRR, CBE, CBE_BIRR, AWASH, BOA
+  amount       Float
+  currency     String       @default("ETB")
+  payerName    String
+  payerPhone   String?
+  referenceId  String       @unique
+  balanceAfter Float?
+  rawMessage   String
+  status       String       @default("VERIFIED") // VERIFIED, DUPLICATE, FAILED
+  createdAt    DateTime     @default(now())
+  webhookLogs  WebhookLog[]
+}
+
+model WebhookLog {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactionId  String?
+  transaction    Transaction? @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  endpoint       String
+  requestPayload String
+  responseStatus Int?
+  responseBody   String?
+  isSuccess      Boolean      @default(false)
+  attempts       Int          @default(1)
+  createdAt      DateTime     @default(now())
+}
