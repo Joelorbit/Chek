@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { Navbar } from "@/components/navbar";
 import {
   WebhooksLogo,
-  ShieldCheck,
   FloppyDisk,
-  ArrowsClockwise,
+  CheckCircle,
   Copy,
   Check,
-  CheckCircle,
+  ShieldCheck,
+  ArrowsClockwise,
   Clock,
   Eye,
   EyeSlash,
@@ -18,11 +18,11 @@ import {
 interface WebhookLog {
   id: string;
   endpoint: string;
-  requestPayload: string;
-  responseStatus: number | null;
+  event: string;
+  payload: string;
+  responseCode: number | null;
   responseBody: string | null;
-  isSuccess: boolean;
-  attempts: number;
+  success: boolean;
   createdAt: string;
 }
 
@@ -37,20 +37,19 @@ export default function WebhooksPage() {
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   useEffect(() => {
-    const key = localStorage.getItem("birrrelay_api_key");
-    if (key) {
-      setApiKey(key);
-      fetchConfig(key);
-    }
+    fetchConfig();
   }, []);
 
-  async function fetchConfig(key: string) {
+  async function fetchConfig() {
     try {
-      const res = await fetch("/api/auth/me", {
-        headers: { "x-api-key": key },
-      });
+      const storedKey = localStorage.getItem("birrrelay_api_key") || "";
+      const headers: Record<string, string> = {};
+      if (storedKey) headers["x-api-key"] = storedKey;
+
+      const res = await fetch("/api/auth/me", { headers });
       if (res.ok) {
         const data = await res.json();
+        setApiKey(data.user?.apiKey || "");
         setWebhookUrl(data.user?.webhookUrl || "");
         setWebhookSecret(data.user?.webhookSecret || "");
         setWebhookLogs(data.webhookLogs || []);
@@ -105,7 +104,7 @@ export default function WebhooksPage() {
             <WebhooksLogo size={22} weight="duotone" className="text-[var(--accent)]" />
           </h1>
           <p className="text-xs text-[var(--text-muted)] mt-1">
-            Configure your destination URL where BirrRelay forwards verified bank events in real-time.
+            Configure your destination URL where Chek forwards verified bank events in real-time.
           </p>
         </div>
 
@@ -128,7 +127,7 @@ export default function WebhooksPage() {
                     className="w-full bg-[var(--surface-pressed)] border border-[var(--line)] rounded-eyu px-3.5 py-2 text-[var(--ink)] font-mono focus:outline-none focus:border-[var(--accent)] transition-colors"
                   />
                   <p className="text-[10px] text-[var(--text-faint)] mt-1 font-mono">
-                    BirrRelay will send an HMAC-signed POST request.
+                    Chek will send an HMAC-signed POST request.
                   </p>
                 </div>
 
@@ -155,7 +154,7 @@ export default function WebhooksPage() {
                 <ShieldCheck size={16} weight="duotone" className="text-[var(--complement)]" /> Signing Secret
               </h2>
               <p className="text-xs text-[var(--text-muted)] mb-4">
-                Used to verify that webhook payloads originated from BirrRelay.
+                Used to verify that webhook payloads originated from Chek.
               </p>
 
               <div className="flex items-center gap-2 bg-[var(--surface-pressed)] p-2.5 rounded-eyu border border-[var(--line)] font-mono text-xs text-[var(--ink)]">
@@ -181,7 +180,7 @@ export default function WebhooksPage() {
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-heading text-sm font-bold text-[var(--ink)]">Recent Webhook Deliveries</h2>
                 <button
-                  onClick={() => apiKey && fetchConfig(apiKey)}
+                  onClick={fetchConfig}
                   className="text-xs text-[var(--text-muted)] hover:text-[var(--ink)] flex items-center gap-1 font-mono"
                 >
                   <ArrowsClockwise size={13} weight="duotone" /> Refresh
@@ -203,12 +202,12 @@ export default function WebhooksPage() {
                         <div className="flex items-center gap-2">
                           <span
                             className={`px-2 py-0.5 rounded-eyu font-bold text-[11px] ${
-                              log.isSuccess
+                              log.success
                                 ? "bg-[var(--accent-soft)] text-[var(--accent-strong)] dark:text-[var(--ink)] border border-[var(--accent)]/40"
                                 : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20"
                             }`}
                           >
-                            {log.responseStatus || "ERR"}
+                            {log.responseCode || "ERR"}
                           </span>
                           <span className="text-[var(--ink)] truncate max-w-xs">{log.endpoint}</span>
                         </div>
