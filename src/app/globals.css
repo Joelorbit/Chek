@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   EYUTASTE DESIGN SYSTEM TOKEN CONTRACT (LIGHT & DARK DUAL MODE)
+   ============================================================================ */
+
+:root {
+  color-scheme: light;
+  --radius: 0.425rem;
+
+  /* LIGHT / WHITE MODE TOKENS */
+  --bg: #f5f6f4;
+  --surface: #ffffff;
+  --surface-elevated: #edebe7;
+  --surface-raised: #e4e2dd;
+  --surface-pressed: #e0ded9;
+  --surface-inset: #edebe7;
+
+  --ink: #232323;
+  --ink-inverse: #d3d5d0;
+
+  --text-primary: #232323;
+  --text-secondary: rgba(35, 35, 35, 0.82);
+  --text-muted: rgba(35, 35, 35, 0.65);
+  --text-faint: rgba(35, 35, 35, 0.40);
+
+  --line: rgba(35, 35, 35, 0.12);
+  --line-strong: rgba(35, 35, 35, 0.22);
+  --line-soft: rgba(35, 35, 35, 0.06);
+
+  --accent: #5a6237;            /* Olive Moss */
+  --accent-strong: #6c7642;
+  --accent-soft: rgba(90, 98, 55, 0.15);
+
+  --complement: #b48148;        /* Golden Ochre */
+  --complement-strong: #c89254;
+  --complement-soft: rgba(180, 129, 72, 0.15);
+
+  --terracotta: #7e5026;
+  --terracotta-soft: rgba(126, 80, 38, 0.15);
+
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-body: 'Lexend', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+.dark {
+  color-scheme: dark;
+
+  /* DARK / CHARCOAL MODE TOKENS (Base EyuTaste) */
+  --bg: #232323;
+  --surface: #2a2a2a;
+  --surface-elevated: #323232;
+  --surface-raised: #3c3c3c;
+  --surface-pressed: #1a1a1a;
+  --surface-inset: #1a1a1a;
+
+  --ink: #d3d5d0;
+  --ink-inverse: #232323;
+
+  --text-primary: #d3d5d0;
+  --text-secondary: rgba(211, 213, 208, 0.82);
+  --text-muted: rgba(211, 213, 208, 0.68);
+  --text-faint: rgba(211, 213, 208, 0.46);
+
+  --line: rgba(211, 213, 208, 0.14);
+  --line-strong: rgba(211, 213, 208, 0.28);
+  --line-soft: rgba(211, 213, 208, 0.07);
+
+  --accent: #5a6237;
+  --accent-strong: #6c7642;
+  --accent-soft: rgba(90, 98, 55, 0.20);
+
+  --complement: #b48148;
+  --complement-strong: #c89254;
+  --complement-soft: rgba(180, 129, 72, 0.18);
+
+  --terracotta: #7e5026;
+  --terracotta-soft: rgba(126, 80, 38, 0.20);
+}
+
+@layer base {
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+  }
+}
+
+/* EyuTheme Card Surface utilities */
+.eyu-card {
+  background-color: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: border-color 0.15s ease, background-color 0.2s ease;
+}
+
+.eyu-card:hover {
+  border-color: var(--line-strong);
+}
+
+.eyu-card-elevated {
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+}
+
+.eyu-input {
+  background-color: var(--surface-pressed);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  border-radius: var(--radius);
+}
+
+.eyu-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Custom sleek scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: var(--radius);
+}
