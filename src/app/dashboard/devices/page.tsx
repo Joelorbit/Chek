@@ -11,6 +11,8 @@ import {
   Clock,
   Copy,
   Check,
+  Key,
+  ArrowsClockwise,
 } from "@phosphor-icons/react";
 
 interface Device {
@@ -28,12 +30,29 @@ export default function DevicesPage() {
   const [devices, setDevices] = useState<Device[]>([]);
   const [pairingCode, setPairingCode] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copiedPin, setCopiedPin] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const key = localStorage.getItem("birrrelay_api_key");
-    if (key) {
+    let key = localStorage.getItem("birrrelay_api_key");
+    if (!key) {
+      // Auto-register / load default demo key
+      fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "dev@chek.et", password: "password123", name: "Solo Dev" }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.user?.apiKey) {
+            localStorage.setItem("birrrelay_api_key", data.user.apiKey);
+            setApiKey(data.user.apiKey);
+            fetchDevices(data.user.apiKey);
+          }
+        })
+        .catch(() => {});
+    } else {
       setApiKey(key);
       fetchDevices(key);
     }
@@ -79,10 +98,18 @@ export default function DevicesPage() {
     }
   }
 
-  function copyToClipboard(text: string) {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  function copyPin() {
+    if (!pairingCode) return;
+    navigator.clipboard.writeText(pairingCode);
+    setCopiedPin(true);
+    setTimeout(() => setCopiedPin(false), 2000);
+  }
+
+  function copyKey() {
+    if (!apiKey) return;
+    navigator.clipboard.writeText(apiKey);
+    setCopiedKey(true);
+    setTimeout(() => setCopiedKey(false), 2000);
   }
 
   return (
@@ -97,58 +124,95 @@ export default function DevicesPage() {
               <DeviceMobile size={22} weight="duotone" className="text-[var(--accent)]" />
             </h1>
             <p className="text-xs text-[var(--text-muted)] mt-1">
-              Pair your Android phone using a 6-digit PIN (inspired by Odit.et simplicity).
+              Pair your Android companion phone via 6-digit PIN or direct API Key.
             </p>
           </div>
 
-          <button
-            onClick={generateCode}
-            disabled={generating}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-eyu text-xs font-semibold bg-[var(--accent)] text-white dark:text-[#d3d5d0] hover:opacity-90 border border-[var(--accent)]/60 transition-all disabled:opacity-50 shadow-sm"
-          >
-            <Plus size={16} weight="bold" />
-            {generating ? "Generating PIN..." : "Pair New Device"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => apiKey && fetchDevices(apiKey)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-eyu text-xs font-semibold bg-[var(--surface)] hover:bg-[var(--surface-elevated)] text-[var(--ink)] border border-[var(--line)] transition-all shadow-sm"
+              title="Refresh Devices"
+            >
+              <ArrowsClockwise size={15} weight="bold" />
+              Refresh
+            </button>
+            <button
+              onClick={generateCode}
+              disabled={generating}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-eyu text-xs font-semibold bg-[var(--accent)] text-white dark:text-[#d3d5d0] hover:opacity-90 border border-[var(--accent)]/60 transition-all disabled:opacity-50 shadow-sm"
+            >
+              <Plus size={16} weight="bold" />
+              {generating ? "Generating PIN..." : "Pair New Device"}
+            </button>
+          </div>
         </div>
 
-        {/* 6-Digit Pairing Box */}
+        {/* 6-Digit Pairing & API Key Box */}
         {pairingCode && (
           <div className="my-6 p-6 sm:p-8 rounded-eyu bg-[var(--surface)] border-2 border-[var(--accent)] shadow-md">
-            <div className="max-w-md mx-auto text-center">
+            <div className="max-w-xl mx-auto text-center">
               <div className="w-10 h-10 rounded-eyu bg-[var(--accent-soft)] border border-[var(--accent)]/40 flex items-center justify-center text-[var(--ink)] mx-auto mb-3">
                 <DeviceMobile size={20} weight="duotone" />
               </div>
-              <h3 className="font-heading text-base font-bold text-[var(--ink)] mb-1">Enter 6-Digit PIN on Phone</h3>
+              <h3 className="font-heading text-base font-bold text-[var(--ink)] mb-1">
+                Enter Details in Chek Android App
+              </h3>
               <p className="text-xs text-[var(--text-muted)] mb-5">
-                Open the BirrRelay Android App on your device and type this pairing PIN:
+                Open the Chek app on your phone and enter either the 6-digit PIN or your API Key:
               </p>
 
-              <div className="inline-flex items-center justify-center gap-2 sm:gap-3 font-mono text-3xl font-extrabold text-[var(--complement)] tracking-widest bg-[var(--surface-pressed)] px-6 py-3.5 rounded-eyu border border-[var(--line)] mb-5">
-                {pairingCode.split("").map((digit, i) => (
-                  <span key={i} className="w-7 text-center">
-                    {digit}
-                  </span>
-                ))}
+              {/* Method 1: 6-Digit PIN */}
+              <div className="p-4 rounded-eyu bg-[var(--surface-pressed)] border border-[var(--line)] mb-4">
+                <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[var(--text-muted)] block mb-2">
+                  Option 1: Quick 6-Digit PIN
+                </span>
+                <div className="inline-flex items-center justify-center gap-2 sm:gap-3 font-mono text-3xl font-extrabold text-[var(--complement)] tracking-widest px-4 py-2">
+                  {pairingCode.split("").map((digit, i) => (
+                    <span key={i} className="w-7 text-center">
+                      {digit}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-2">
+                  <button
+                    onClick={copyPin}
+                    className="px-3 py-1 rounded-eyu text-xs font-semibold bg-[var(--surface-elevated)] hover:bg-[var(--surface-raised)] text-[var(--ink)] border border-[var(--line)] inline-flex items-center gap-1.5 transition-colors font-mono"
+                  >
+                    {copiedPin ? <Check size={13} weight="bold" className="text-[var(--accent)]" /> : <Copy size={13} weight="duotone" />}
+                    {copiedPin ? "Copied PIN" : "Copy PIN"}
+                  </button>
+                </div>
+              </div>
+
+              {/* Method 2: Direct API Key */}
+              <div className="p-4 rounded-eyu bg-[var(--surface-pressed)] border border-[var(--line)] mb-5">
+                <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[var(--text-muted)] block mb-2">
+                  Option 2: Direct API Key (Never Expires)
+                </span>
+                <div className="flex items-center justify-between gap-2 bg-[var(--surface)] p-2 rounded-eyu border border-[var(--line)]">
+                  <span className="font-mono text-xs text-[var(--ink)] truncate">{apiKey}</span>
+                  <button
+                    onClick={copyKey}
+                    className="px-2.5 py-1 rounded-eyu text-xs font-semibold bg-[var(--accent-soft)] hover:bg-[var(--accent)] text-[var(--accent-strong)] dark:text-[var(--ink)] hover:text-white border border-[var(--accent)]/40 shrink-0 inline-flex items-center gap-1 font-mono transition-colors"
+                  >
+                    {copiedKey ? <Check size={12} weight="bold" /> : <Copy size={12} weight="duotone" />}
+                    {copiedKey ? "Copied" : "Copy Key"}
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center justify-center gap-2">
                 <button
-                  onClick={() => copyToClipboard(pairingCode)}
-                  className="px-3 py-1.5 rounded-eyu text-xs font-semibold bg-[var(--surface-elevated)] hover:bg-[var(--surface-raised)] text-[var(--ink)] border border-[var(--line)] flex items-center gap-1.5 transition-colors font-mono"
-                >
-                  {copied ? <Check size={14} weight="bold" className="text-[var(--accent)]" /> : <Copy size={14} weight="duotone" />}
-                  {copied ? "Copied" : "Copy PIN"}
-                </button>
-                <button
                   onClick={() => setPairingCode(null)}
-                  className="px-3 py-1.5 rounded-eyu text-xs font-semibold bg-[var(--surface-elevated)] hover:bg-[var(--surface-raised)] text-[var(--text-muted)] hover:text-[var(--ink)] border border-[var(--line)] transition-colors"
+                  className="px-4 py-1.5 rounded-eyu text-xs font-semibold bg-[var(--surface-elevated)] hover:bg-[var(--surface-raised)] text-[var(--text-muted)] hover:text-[var(--ink)] border border-[var(--line)] transition-colors"
                 >
-                  Dismiss
+                  Close Box
                 </button>
               </div>
 
               <p className="text-[11px] text-[var(--text-faint)] mt-4 flex items-center justify-center gap-1 font-mono">
-                <Clock size={13} weight="duotone" /> PIN expires in 15 minutes
+                <Clock size={13} weight="duotone" /> PIN active for 60 minutes
               </p>
             </div>
           </div>

@@ -20,7 +20,7 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:layout_marginTop="16dp"
-            android:layout_marginBottom="24dp">
+            android:layout_marginBottom="20dp">
 
             <TextView
                 android:layout_width="0dp"
@@ -55,7 +55,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="DEVICE PAIRING"
+                android:text="CONNECT DEVICE"
                 android:textColor="@color/eyu_golden_ochre"
                 android:textSize="10sp"
                 android:textStyle="bold"
@@ -66,7 +66,7 @@
                 android:id="@+id/tvCardSubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Connect to your Chek Console"
+                android:text="Enter Server URL and 6-Digit PIN or API Key"
                 android:textColor="@color/eyu_ink_muted_dark"
                 android:textSize="12sp"
                 android:layout_marginBottom="16dp" />
@@ -80,23 +80,41 @@
                 android:textSize="11sp"
                 android:layout_marginBottom="4dp" />
 
-            <EditText
-                android:id="@+id/etServerUrl"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="46dp"
-                android:hint="https://your-domain.com"
-                android:textColor="@color/eyu_ink_dark"
-                android:textColorHint="#55848580"
-                android:background="@color/eyu_surface_pressed_dark"
-                android:padding="10dp"
-                android:textSize="13sp"
-                android:layout_marginBottom="14dp" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="14dp">
 
-            <!-- Pairing PIN -->
+                <EditText
+                    android:id="@+id/etServerUrl"
+                    android:layout_width="0dp"
+                    android:layout_height="46dp"
+                    android:layout_weight="1"
+                    android:hint="http://192.168.1.11:3000"
+                    android:textColor="@color/eyu_ink_dark"
+                    android:textColorHint="#55848580"
+                    android:background="@color/eyu_surface_pressed_dark"
+                    android:padding="10dp"
+                    android:textSize="13sp" />
+
+                <Button
+                    android:id="@+id/btnTestPing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="46dp"
+                    android:text="⚡ Ping"
+                    android:textSize="11sp"
+                    android:textColor="@color/eyu_golden_ochre"
+                    android:backgroundTint="@color/eyu_surface_elevated_dark"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+
+            <!-- Pairing PIN or API Key -->
             <TextView
+                android:id="@+id/tvCodeLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="6-Digit Pairing PIN"
+                android:text="6-Digit PIN or API Key (br_live_...)"
                 android:textColor="@color/eyu_ink_muted_dark"
                 android:textSize="11sp"
                 android:layout_marginBottom="4dp" />
@@ -105,16 +123,14 @@
                 android:id="@+id/etPairingCode"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:hint="1 2 3 4 5 6"
+                android:hint="PIN or br_live_..."
                 android:textColor="@color/eyu_golden_ochre"
                 android:textColorHint="#55848580"
                 android:background="@color/eyu_surface_pressed_dark"
                 android:padding="10dp"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:inputType="number"
                 android:gravity="center"
-                android:letterSpacing="0.2"
                 android:layout_marginBottom="18dp" />
 
             <!-- Pair Button -->
@@ -153,7 +169,7 @@
                 android:id="@+id/tvStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="● Ready to pair"
+                android:text="● Ready to connect"
                 android:textColor="@color/eyu_olive_moss"
                 android:textSize="12sp"
                 android:textStyle="bold"
@@ -163,7 +179,7 @@
                 android:id="@+id/tvPrivacyNotice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🔒 On-Device Privacy: Only payment notifications (CBE, Telebirr, Awash) are processed. OTPs and private messages are discarded locally."
+                android:text="🔒 On-Device Privacy: Only payment SMS (CBE, Telebirr, Awash) are parsed. OTPs, 2FA tokens, and private messages are discarded locally on this phone."
                 android:textColor="@color/eyu_ink_muted_dark"
                 android:textSize="10sp"
                 android:lineSpacingExtra="2dp" />
