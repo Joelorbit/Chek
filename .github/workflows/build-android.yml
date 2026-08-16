@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build & Release Android APK
 
 on:
   push:
@@ -7,6 +7,9 @@ on:
       - 'android-client/**'
       - '.github/workflows/build-android.yml'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -36,10 +39,9 @@ jobs:
       - name: Build Debug APK
         run: |
           cd android-client
-          # Use Gradle to assemble the debug APK
           gradle assembleDebug || (gradle wrapper && ./gradlew assembleDebug)
 
-      - name: Rename APK for Easy Access
+      - name: Prepare APK Asset
         run: |
           mkdir -p output-apk
           find android-client/app/build/outputs/apk -name "*.apk" -exec cp {} output-apk/chek-companion.apk \; || true
@@ -51,3 +53,29 @@ jobs:
           name: chek-android-app
           path: output-apk/chek-companion.apk
           retention-days: 30
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: v1.0.0
+          name: "Chek Companion App v1.0.0"
+          body: |
+            ## 📱 Chek Android Companion App
+
+            Latest build of the Chek Ethiopian payment verification companion app.
+
+            ### ✨ What's Included:
+            - **CBE, Telebirr, Awash Bank, Bank of Abyssinia (BOA)** instant SMS/notification interception.
+            - **On-Device Privacy Guard**: drops OTPs, 2FA, debit alerts, and personal SMS locally on the device.
+            - **Odit-grade UI**: Hero Stats volume tracking, horizontal filter chips, tap-to-inspect bottom sheet.
+            - **6-Digit Real-Time Pairing**: Instant handshake with Chek Cloud Server.
+
+            ---
+            ### 📥 Download:
+            Download **`chek-companion.apk`** below to install directly on your Android phone!
+          files: output-apk/chek-companion.apk
+          prerelease: false
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
