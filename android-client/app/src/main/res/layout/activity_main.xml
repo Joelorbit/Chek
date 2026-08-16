@@ -185,7 +185,6 @@
                         android:paddingHorizontal="14dp"
                         android:paddingVertical="6dp"
                         android:layout_marginEnd="6dp"
-                        android:selected="true"
                         android:clickable="true"
                         android:focusable="true" />
 
