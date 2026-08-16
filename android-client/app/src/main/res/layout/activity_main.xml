@@ -1,29 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rootContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/eyu_canvas_dark">
 
-    <!-- Top App Bar -->
+    <!-- ════════════════════════════════════════════════
+         TOP APP BAR
+         ════════════════════════════════════════════════ -->
     <LinearLayout
         android:id="@+id/topBar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingHorizontal="20dp"
-        android:paddingTop="18dp"
-        android:paddingBottom="12dp"
-        android:layout_alignParentTop="true">
+        android:paddingHorizontal="18dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="14dp"
+        android:background="@color/eyu_canvas_dark"
+        android:elevation="4dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Brand icon -->
         <ImageView
             android:id="@+id/ivBrandIcon"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:src="@drawable/ic_launcher_foreground"
-            android:layout_marginEnd="12dp" />
+            android:layout_marginEnd="10dp"
+            android:scaleType="centerCrop" />
 
+        <!-- Title + Status -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -36,8 +47,9 @@
                 android:layout_height="wrap_content"
                 android:text="Chek"
                 android:textColor="@color/eyu_ink_dark"
-                android:textSize="22sp"
-                android:textStyle="bold" />
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:letterSpacing="-0.02" />
 
             <TextView
                 android:id="@+id/tvTopStatus"
@@ -49,6 +61,7 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
+        <!-- Battery badge -->
         <TextView
             android:id="@+id/tvBatteryBadge"
             android:layout_width="wrap_content"
@@ -62,48 +75,54 @@
             android:paddingVertical="5dp" />
     </LinearLayout>
 
-    <!-- Main Scrollable Content Area -->
-    <ScrollView
-        android:id="@+id/contentScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/topBar"
-        android:layout_above="@+id/bottomDock"
-        android:fillViewport="true">
+    <!-- ════════════════════════════════════════════════
+         MAIN CONTENT AREA
+         ════════════════════════════════════════════════ -->
+    <FrameLayout
+        android:id="@+id/contentArea"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toTopOf="@id/bottomDock"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- ═══ TAB 0: LIVE FEED ═══ -->
         <LinearLayout
+            android:id="@+id/tabHomeView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
-            android:paddingHorizontal="18dp"
-            android:paddingBottom="24dp">
+            android:visibility="visible">
 
-            <!-- ================= TAB 1: HOME / FEED ================= -->
-            <LinearLayout
-                android:id="@+id/tabHomeView"
+            <!-- Hero Stats Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardVolumeSummary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="visible">
+                android:layout_marginHorizontal="14dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="10dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="3dp"
+                app:cardBackgroundColor="@color/eyu_surface_dark">
 
-                <!-- Volume Summary Hero Card -->
                 <LinearLayout
-                    android:id="@+id/cardVolumeSummary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:background="@drawable/card_rounded_dark"
-                    android:padding="20dp"
-                    android:layout_marginBottom="14dp">
+                    android:paddingHorizontal="18dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="14dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="TODAY'S VERIFIED VOLUME"
                         android:textColor="@color/eyu_golden_ochre"
-                        android:textSize="10sp"
+                        android:textSize="9sp"
                         android:textStyle="bold"
-                        android:letterSpacing="0.1" />
+                        android:letterSpacing="0.12" />
 
                     <TextView
                         android:id="@+id/tvHomeVolume"
@@ -113,290 +132,469 @@
                         android:textColor="@color/eyu_ink_dark"
                         android:textSize="30sp"
                         android:textStyle="bold"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="2dp"
                         android:layout_marginBottom="2dp" />
 
                     <TextView
                         android:id="@+id/tvHomeCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="0 payments intercepted • 0% gateway cuts"
+                        android:text="0 payments intercepted  •  0% gateway cuts"
                         android:textColor="@color/eyu_ink_muted_dark"
-                        android:textSize="11sp" />
+                        android:textSize="11sp"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Deep Scan Button -->
+                    <Button
+                        android:id="@+id/btnSyncPastSms"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:text="⟳  Deep Scan SMS Inbox"
+                        android:textSize="12sp"
+                        android:textColor="@color/eyu_ink_dark"
+                        android:backgroundTint="@color/eyu_olive_moss"
+                        android:textStyle="bold" />
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-                <!-- Sync Past SMS Action Button -->
-                <Button
-                    android:id="@+id/btnSyncPastSms"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:text="🔄 Sync Past Bank SMS Inbox"
-                    android:textSize="12sp"
-                    android:textColor="@color/eyu_golden_ochre"
-                    android:backgroundTint="@color/eyu_surface_elevated_dark"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="16dp" />
+            <!-- Filter Row -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="none"
+                android:paddingHorizontal="14dp"
+                android:layout_marginBottom="8dp">
 
-                <!-- Live Stream Title -->
-                <TextView
+                <LinearLayout
+                    android:id="@+id/filterRow"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="INTERCEPTED PAYMENT FEED"
-                    android:textColor="@color/eyu_golden_ochre"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.1"
-                    android:layout_marginBottom="10dp" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                <!-- Empty State Message -->
+                    <!-- Filter: All -->
+                    <TextView
+                        android:id="@+id/chipAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="All"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/eyu_ink_dark"
+                        android:background="@drawable/filter_chip_bg"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:selected="true"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipCbe"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CBE"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/eyu_ink_muted_dark"
+                        android:background="@drawable/filter_chip_bg"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipTelebirr"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Telebirr"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/eyu_ink_muted_dark"
+                        android:background="@drawable/filter_chip_bg"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipBoa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BOA"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/eyu_ink_muted_dark"
+                        android:background="@drawable/filter_chip_bg"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="6dp"
+                        android:layout_marginEnd="6dp"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/chipAwash"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Awash"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/eyu_ink_muted_dark"
+                        android:background="@drawable/filter_chip_bg"
+                        android:paddingHorizontal="14dp"
+                        android:paddingVertical="6dp"
+                        android:clickable="true"
+                        android:focusable="true" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <!-- Section label -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TRANSACTION STREAM"
+                android:textColor="@color/eyu_golden_ochre"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.12"
+                android:layout_marginHorizontal="14dp"
+                android:layout_marginBottom="6dp" />
+
+            <!-- Empty state -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/tvEmptyFeed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="14dp"
+                android:visibility="visible"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="1dp"
+                app:cardBackgroundColor="@color/eyu_surface_dark">
+
                 <TextView
-                    android:id="@+id/tvEmptyFeed"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="No payments intercepted yet. Tap 'Sync Past Bank SMS Inbox' above or receive an SMS from Telebirr (127), CBE, Abyssinia, or Awash."
+                    android:text="No payments yet. Tap &#8220;Deep Scan SMS Inbox&#8221; above, or receive a payment via Telebirr (127), CBE, BOA, or Awash — it will appear here instantly."
                     android:textColor="@color/eyu_ink_muted_dark"
                     android:textSize="12sp"
-                    android:background="@drawable/card_rounded_dark"
                     android:padding="16dp"
-                    android:lineSpacingExtra="3dp"
-                    android:visibility="visible" />
+                    android:lineSpacingExtra="3dp" />
+            </androidx.cardview.widget.CardView>
 
-                <!-- Dynamic Container for Payment Cards -->
-                <LinearLayout
-                    android:id="@+id/llPaymentCards"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" />
-            </LinearLayout>
+            <!-- Payment Feed RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPayments"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingHorizontal="14dp"
+                android:paddingBottom="8dp"
+                android:clipToPadding="false"
+                android:scrollbars="none"
+                android:visibility="gone" />
+        </LinearLayout>
 
-            <!-- ================= TAB 2: RELAY / ENGINE ================= -->
+        <!-- ═══ TAB 1: RELAY / PAIRING ═══ -->
+        <ScrollView
+            android:id="@+id/tabRelayView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
             <LinearLayout
-                android:id="@+id/tabRelayView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:paddingHorizontal="14dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="24dp">
 
-                <LinearLayout
+                <!-- Gateway Connection Card -->
+                <androidx.cardview.widget.CardView
                     android:id="@+id/cardRelayConfig"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/card_rounded_dark"
-                    android:padding="20dp"
-                    android:layout_marginBottom="14dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="GATEWAY SERVER CONNECTION"
-                        android:textColor="@color/eyu_golden_ochre"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.1"
-                        android:layout_marginBottom="12dp" />
-
-                    <!-- Server URL -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Server URL (Wi-Fi IP or Cloud Domain)"
-                        android:textColor="@color/eyu_ink_muted_dark"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="4dp" />
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/eyu_surface_dark">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="16dp">
+                        android:orientation="vertical"
+                        android:padding="18dp">
 
-                        <EditText
-                            android:id="@+id/etServerUrl"
-                            android:layout_width="0dp"
-                            android:layout_height="48dp"
-                            android:layout_weight="1"
-                            android:hint="http://192.168.1.11:3000"
-                            android:textColor="@color/eyu_ink_dark"
-                            android:textColorHint="#55848580"
-                            android:background="@color/eyu_surface_pressed_dark"
-                            android:padding="10dp"
-                            android:textSize="13sp" />
-
-                        <Button
-                            android:id="@+id/btnTestPing"
+                        <TextView
                             android:layout_width="wrap_content"
-                            android:layout_height="48dp"
-                            android:text="⚡ Ping"
-                            android:textSize="11sp"
+                            android:layout_height="wrap_content"
+                            android:text="GATEWAY SERVER"
                             android:textColor="@color/eyu_golden_ochre"
-                            android:backgroundTint="@color/eyu_surface_elevated_dark"
-                            android:layout_marginStart="8dp" />
+                            android:textSize="9sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.12"
+                            android:layout_marginBottom="14dp" />
+
+                        <!-- Server URL label -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Server URL"
+                            android:textColor="@color/eyu_ink_muted_dark"
+                            android:textSize="11sp"
+                            android:layout_marginBottom="4dp" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="18dp">
+
+                            <EditText
+                                android:id="@+id/etServerUrl"
+                                android:layout_width="0dp"
+                                android:layout_height="48dp"
+                                android:layout_weight="1"
+                                android:hint="https://yourserver.com"
+                                android:textColor="@color/eyu_ink_dark"
+                                android:textColorHint="#44848580"
+                                android:background="@color/eyu_surface_pressed_dark"
+                                android:paddingHorizontal="12dp"
+                                android:textSize="13sp"
+                                android:inputType="textUri" />
+
+                            <Button
+                                android:id="@+id/btnTestPing"
+                                android:layout_width="72dp"
+                                android:layout_height="48dp"
+                                android:text="⚡ Ping"
+                                android:textSize="11sp"
+                                android:textColor="@color/eyu_golden_ochre"
+                                android:backgroundTint="@color/eyu_surface_elevated_dark"
+                                android:layout_marginStart="8dp" />
+                        </LinearLayout>
+
+                        <!-- 6-digit PIN label -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="6-Digit Pairing PIN"
+                            android:textColor="@color/eyu_ink_muted_dark"
+                            android:textSize="11sp"
+                            android:layout_marginBottom="4dp" />
+
+                        <!-- OTP-style 6 digit boxes -->
+                        <LinearLayout
+                            android:id="@+id/pinBoxContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_marginBottom="18dp">
+
+                            <EditText android:id="@+id/pinBox1" style="@style/PinBoxStyle" />
+                            <EditText android:id="@+id/pinBox2" style="@style/PinBoxStyle" />
+                            <EditText android:id="@+id/pinBox3" style="@style/PinBoxStyle" />
+                            <EditText android:id="@+id/pinBox4" style="@style/PinBoxStyle" />
+                            <EditText android:id="@+id/pinBox5" style="@style/PinBoxStyle" />
+                            <EditText android:id="@+id/pinBox6" style="@style/PinBoxStyle" />
+                        </LinearLayout>
+
+                        <!-- Pair Button -->
+                        <Button
+                            android:id="@+id/btnPair"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:text="Pair &amp; Activate Relay"
+                            android:textColor="@color/eyu_ink_dark"
+                            android:backgroundTint="@color/eyu_olive_moss"
+                            android:textStyle="bold"
+                            android:textSize="14sp" />
                     </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
-                    <!-- 6-Digit PIN Entry -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Enter 6-Digit PIN (From Web Dashboard)"
-                        android:textColor="@color/eyu_ink_muted_dark"
-                        android:textSize="11sp"
-                        android:layout_marginBottom="4dp" />
-
-                    <EditText
-                        android:id="@+id/etPairingCode"
-                        android:layout_width="match_parent"
-                        android:layout_height="52dp"
-                        android:hint="• • • • • •"
-                        android:textColor="@color/eyu_golden_ochre"
-                        android:textColorHint="#55848580"
-                        android:background="@color/eyu_surface_pressed_dark"
-                        android:padding="10dp"
-                        android:textSize="22sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.2"
-                        android:inputType="number"
-                        android:maxLength="6"
-                        android:gravity="center"
-                        android:layout_marginBottom="16dp" />
-
-                    <!-- Pair Button -->
-                    <Button
-                        android:id="@+id/btnPair"
-                        android:layout_width="match_parent"
-                        android:layout_height="50dp"
-                        android:text="Pair &amp; Activate Relay"
-                        android:textColor="@color/eyu_ink_dark"
-                        android:backgroundTint="@color/eyu_olive_moss"
-                        android:textStyle="bold"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <!-- Permissions Status Card -->
-                <LinearLayout
+                <!-- Permissions Card -->
+                <androidx.cardview.widget.CardView
                     android:id="@+id/cardPermissions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/card_rounded_dark"
-                    android:padding="16dp">
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/eyu_surface_dark">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="RELAY SERVICE PERMISSIONS"
-                        android:textColor="@color/eyu_golden_ochre"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.1"
-                        android:layout_marginBottom="8dp" />
+                        android:orientation="vertical"
+                        android:padding="18dp">
 
-                    <Button
-                        android:id="@+id/btnGrantNotification"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:text="✓ Notification Listener Active"
-                        android:textSize="11sp"
-                        android:textColor="@color/eyu_ink_dark"
-                        android:backgroundTint="@color/eyu_surface_elevated_dark"
-                        android:layout_marginBottom="6dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="RELAY PERMISSIONS"
+                            android:textColor="@color/eyu_golden_ochre"
+                            android:textSize="9sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.12"
+                            android:layout_marginBottom="12dp" />
 
-                    <Button
-                        android:id="@+id/btnGrantSms"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:text="✓ SMS Telephony Interceptor Active"
-                        android:textSize="11sp"
-                        android:textColor="@color/eyu_ink_dark"
-                        android:backgroundTint="@color/eyu_surface_elevated_dark" />
-                </LinearLayout>
+                        <Button
+                            android:id="@+id/btnGrantNotification"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:text="Notification Listener Access"
+                            android:textSize="12sp"
+                            android:textColor="@color/eyu_ink_dark"
+                            android:backgroundTint="@color/eyu_surface_elevated_dark"
+                            android:layout_marginBottom="8dp" />
+
+                        <Button
+                            android:id="@+id/btnGrantSms"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:text="SMS Read Permission"
+                            android:textSize="12sp"
+                            android:textColor="@color/eyu_ink_dark"
+                            android:backgroundTint="@color/eyu_surface_elevated_dark" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
+        </ScrollView>
 
-            <!-- ================= TAB 3: SETTINGS / LOGS ================= -->
+        <!-- ═══ TAB 2: CONSOLE / SETTINGS ═══ -->
+        <ScrollView
+            android:id="@+id/tabSettingsView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
             <LinearLayout
-                android:id="@+id/tabSettingsView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:paddingHorizontal="14dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="24dp">
 
-                <!-- Theme Card -->
-                <LinearLayout
+                <!-- Appearance Card -->
+                <androidx.cardview.widget.CardView
                     android:id="@+id/cardTheme"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/card_rounded_dark"
-                    android:padding="16dp"
-                    android:layout_marginBottom="14dp">
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/eyu_surface_dark">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="APP APPEARANCE"
-                        android:textColor="@color/eyu_golden_ochre"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.1"
-                        android:layout_marginBottom="8dp" />
-
-                    <Button
-                        android:id="@+id/btnThemeToggle"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:text="Switch to Crisp White Mode"
-                        android:textSize="12sp"
-                        android:textColor="@color/eyu_ink_dark"
-                        android:backgroundTint="@color/eyu_surface_elevated_dark" />
-                </LinearLayout>
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
 
-                <!-- Raw Terminal Logs Card -->
-                <LinearLayout
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="APPEARANCE"
+                            android:textColor="@color/eyu_golden_ochre"
+                            android:textSize="9sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.12"
+                            android:layout_marginBottom="10dp" />
+
+                        <Button
+                            android:id="@+id/btnThemeToggle"
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:text="Switch to Crisp White Mode"
+                            android:textSize="12sp"
+                            android:textColor="@color/eyu_ink_dark"
+                            android:backgroundTint="@color/eyu_surface_elevated_dark" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Terminal Log Card -->
+                <androidx.cardview.widget.CardView
                     android:id="@+id/cardTerminal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:background="@drawable/card_rounded_dark"
-                    android:padding="16dp">
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/eyu_surface_pressed_dark">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="RAW SMS / EVENT TERMINAL"
-                        android:textColor="@color/eyu_golden_ochre"
-                        android:textSize="10sp"
-                        android:textStyle="bold"
-                        android:letterSpacing="0.1"
-                        android:layout_marginBottom="8dp" />
-
-                    <TextView
-                        android:id="@+id/tvTerminalLogs"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="[Chek Relay Daemon Engine Active]\nListening for incoming bank transactions..."
-                        android:textColor="@color/eyu_ink_muted_dark"
-                        android:textSize="11sp"
-                        android:fontFamily="monospace"
-                        android:lineSpacingExtra="2dp" />
-                </LinearLayout>
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="10dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="RAW EVENT TERMINAL"
+                                android:textColor="@color/eyu_golden_ochre"
+                                android:textSize="9sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.12" />
+
+                            <Button
+                                android:id="@+id/btnClearLogs"
+                                android:layout_width="wrap_content"
+                                android:layout_height="28dp"
+                                android:text="Clear"
+                                android:textSize="10sp"
+                                android:textColor="@color/eyu_ink_muted_dark"
+                                android:backgroundTint="@color/eyu_surface_elevated_dark" />
+                        </LinearLayout>
+
+                        <ScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="240dp">
+
+                            <TextView
+                                android:id="@+id/tvTerminalLogs"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="[Chek Relay Engine Active]\nListening for bank transactions..."
+                                android:textColor="@color/eyu_ink_muted_dark"
+                                android:textSize="10sp"
+                                android:fontFamily="monospace"
+                                android:lineSpacingExtra="3dp" />
+                        </ScrollView>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
             </LinearLayout>
+        </ScrollView>
 
-        </LinearLayout>
-    </ScrollView>
+    </FrameLayout>
 
-    <!-- ================= FLOATING BOTTOM DOCK NAVIGATION ================= -->
+    <!-- ════════════════════════════════════════════════
+         BOTTOM NAVIGATION DOCK
+         ════════════════════════════════════════════════ -->
     <LinearLayout
         android:id="@+id/bottomDock"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_width="0dp"
+        android:layout_height="62dp"
         android:orientation="horizontal"
         android:background="@drawable/dock_rounded_dark"
-        android:layout_alignParentBottom="true"
-        android:paddingHorizontal="16dp"
+        android:elevation="16dp"
+        android:paddingHorizontal="8dp"
         android:gravity="center_vertical"
-        android:elevation="12dp">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Tab 1: Home Button -->
+        <!-- Feed tab -->
         <LinearLayout
             android:id="@+id/dockTabHome"
             android:layout_width="0dp"
@@ -408,8 +606,8 @@
 
             <ImageView
                 android:id="@+id/ivDockHomeIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:src="@drawable/ic_phosphor_squares_four" />
 
             <TextView
@@ -418,12 +616,12 @@
                 android:layout_height="wrap_content"
                 android:text="Feed"
                 android:textColor="@color/eyu_olive_moss"
-                android:textSize="10sp"
+                android:textSize="9sp"
                 android:textStyle="bold"
-                android:layout_marginTop="2dp" />
+                android:layout_marginTop="3dp" />
         </LinearLayout>
 
-        <!-- Tab 2: Relay Button -->
+        <!-- Relay tab -->
         <LinearLayout
             android:id="@+id/dockTabRelay"
             android:layout_width="0dp"
@@ -435,8 +633,8 @@
 
             <ImageView
                 android:id="@+id/ivDockRelayIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:src="@drawable/ic_phosphor_lightning" />
 
             <TextView
@@ -445,12 +643,12 @@
                 android:layout_height="wrap_content"
                 android:text="Relay"
                 android:textColor="@color/eyu_ink_muted_dark"
-                android:textSize="10sp"
+                android:textSize="9sp"
                 android:textStyle="bold"
-                android:layout_marginTop="2dp" />
+                android:layout_marginTop="3dp" />
         </LinearLayout>
 
-        <!-- Tab 3: Settings Button -->
+        <!-- Console tab -->
         <LinearLayout
             android:id="@+id/dockTabSettings"
             android:layout_width="0dp"
@@ -462,8 +660,8 @@
 
             <ImageView
                 android:id="@+id/ivDockSettingsIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:src="@drawable/ic_phosphor_gear" />
 
             <TextView
@@ -472,10 +670,10 @@
                 android:layout_height="wrap_content"
                 android:text="Console"
                 android:textColor="@color/eyu_ink_muted_dark"
-                android:textSize="10sp"
+                android:textSize="9sp"
                 android:textStyle="bold"
-                android:layout_marginTop="2dp" />
+                android:layout_marginTop="3dp" />
         </LinearLayout>
     </LinearLayout>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

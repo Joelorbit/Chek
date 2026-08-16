@@ -16,4 +16,21 @@
         <item name="android:textColorPrimary">@color/eyu_ink_light</item>
         <item name="android:colorAccent">@color/eyu_olive_moss</item>
     </style>
+
+    <!-- OTP-style single-digit PIN box -->
+    <style name="PinBoxStyle">
+        <item name="android:layout_width">42dp</item>
+        <item name="android:layout_height">52dp</item>
+        <item name="android:layout_marginHorizontal">4dp</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/eyu_golden_ochre</item>
+        <item name="android:background">@drawable/card_rounded_dark</item>
+        <item name="android:textColorHint">#33848580</item>
+        <item name="android:hint">—</item>
+        <item name="android:cursorVisible">true</item>
+    </style>
 </resources>

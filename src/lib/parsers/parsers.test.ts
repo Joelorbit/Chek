@@ -125,6 +125,41 @@ describe("Ethiopian Bank Parsers Test Suite", () => {
       expect(result?.payerName).toBe("KEBEDE KASSA");
       expect(result?.referenceId).toBe("FT83920192");
     });
+
+    it("should parse CBE BranchReceipt URL format (real production — most missed)", () => {
+      const msg =
+        "Dear Mr Eyuel your Account 1********7638 has been credited with ETB 300.00. Your Current Balance is ETB 29440.39. Thank you for Banking with CBE! for Reciept https://apps.cbe.com.et:100/BranchReceipt/FT26214MQPWP&75487638";
+      const result = parseBankMessage(msg);
+
+      expect(result).not.toBeNull();
+      expect(result?.provider).toBe("CBE");
+      expect(result?.amount).toBe(300);
+      expect(result?.referenceId).toBe("FT26214MQPWP");
+      expect(result?.payerPhoneOrAcc).toBe("1********7638");
+      expect(result?.balanceAfter).toBe(29440.39);
+    });
+
+    it("should parse Amharic CBE credit notification", () => {
+      const msg =
+        "ክቡር ደንበኛችን የሒሳብ ቁጥርዎ 1********7638 በ 300.00 ብር ገቢ ተደርጓል:: ቀሪ ሒሳብዎ 29,440.39 ብር ነው:: የግብይት ቁጥር FT26214MQPWP";
+      const result = parseBankMessage(msg);
+
+      expect(result).not.toBeNull();
+      expect(result?.provider).toBe("CBE");
+      expect(result?.amount).toBe(300);
+      expect(result?.referenceId).toBe("FT26214MQPWP");
+    });
+
+    it("should parse CBE large transfer with BranchReceipt URL and 5000 ETB", () => {
+      const msg =
+        "Dear Mr Eyuel your Account 1000****7638 has been credited with ETB 5,000.00. Your Current Balance is ETB 34440.39. Thank you for Banking with CBE! for Reciept https://apps.cbe.com.et:100/BranchReceipt/FT262163J7WX&75487638";
+      const result = parseBankMessage(msg);
+
+      expect(result).not.toBeNull();
+      expect(result?.provider).toBe("CBE");
+      expect(result?.amount).toBe(5000);
+      expect(result?.referenceId).toBe("FT262163J7WX");
+    });
   });
 
   describe("Bank of Abyssinia (BOA) Parser Suite", () => {

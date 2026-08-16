@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navbar } from "@/components/navbar";
 import {
   DeviceMobile,
@@ -31,15 +31,18 @@ export default function DevicesPage() {
   const [generating, setGenerating] = useState(false);
   const [copiedPin, setCopiedPin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [pairingSuccess, setPairingSuccess] = useState(false);
+  // IDs of devices we already knew about before the PIN was shown
+  const knownDeviceIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    let key = localStorage.getItem("birrrelay_api_key");
+    let key = localStorage.getItem("chek_api_key") || localStorage.getItem("birrrelay_api_key");
     if (!key) {
       fetch("/api/auth/me")
         .then((r) => r.json())
         .then((data) => {
           if (data.user?.apiKey) {
-            localStorage.setItem("birrrelay_api_key", data.user.apiKey);
+            localStorage.setItem("chek_api_key", data.user.apiKey);
             setApiKey(data.user.apiKey);
             fetchDevices(data.user.apiKey);
           }
@@ -50,6 +53,37 @@ export default function DevicesPage() {
       fetchDevices(key);
     }
   }, []);
+
+  // ── Auto-poll every 2s when pairing PIN modal is open ──
+  useEffect(() => {
+    if (!pairingCode || !apiKey) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch("/api/auth/me", {
+          headers: { "x-api-key": apiKey },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const freshDevices: Device[] = data.devices || [];
+
+        // Find a device that is online AND wasn't in our snapshot before pairing
+        const newDevice = freshDevices.find(
+          (d) => d.isOnline && !knownDeviceIdsRef.current.has(d.id)
+        );
+
+        if (newDevice) {
+          setDevices(freshDevices);
+          setPairingCode(null);
+          setPairingSuccess(true);
+          // Reset success banner after 4 seconds
+          setTimeout(() => setPairingSuccess(false), 4000);
+        }
+      } catch (_) {}
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [pairingCode, apiKey]);
 
   async function fetchDevices(key: string) {
     setLoading(true);
@@ -70,6 +104,8 @@ export default function DevicesPage() {
 
   async function generateCode() {
     setGenerating(true);
+    // Snapshot current device IDs before showing the PIN
+    knownDeviceIdsRef.current = new Set(devices.map((d) => d.id));
     try {
       const res = await fetch("/api/v1/device/generate-code", {
         method: "POST",
@@ -133,6 +169,14 @@ export default function DevicesPage() {
           </div>
         </div>
 
+        {/* ── Pairing success banner (auto-dismissing) ── */}
+        {pairingSuccess && (
+          <div className="my-4 px-5 py-3 rounded-eyu bg-[var(--accent-soft)] border border-[var(--accent)]/50 flex items-center gap-3 text-sm font-semibold text-[var(--ink)]">
+            <span className="text-base">🎉</span>
+            <span>Android phone paired and relay engine active!</span>
+          </div>
+        )}
+
         {/* 6-Digit Pairing Box */}
         {pairingCode && (
           <div className="my-6 p-6 sm:p-8 rounded-eyu bg-[var(--surface)] border-2 border-[var(--accent)] shadow-lg">
@@ -178,6 +222,9 @@ export default function DevicesPage() {
 
               <p className="text-[11px] text-[var(--text-faint)] mt-4 flex items-center justify-center gap-1 font-mono">
                 <Clock size={13} weight="duotone" /> PIN active for 60 minutes
+              </p>
+              <p className="text-[11px] text-[var(--accent)] mt-2 flex items-center justify-center gap-1 font-mono animate-pulse">
+                ⟳ Waiting for phone to connect... (auto-detecting)
               </p>
             </div>
           </div>

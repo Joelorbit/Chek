@@ -44,4 +44,7 @@ android-client/.gradle/
 android-client/build/
 android-client/app/build/
 android-client/local.properties
+android-client/.idea/
+.idea/
+*.iml
 *.apk

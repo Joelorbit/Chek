@@ -1,0 +1,53 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'android-client/**'
+      - '.github/workflows/build-android.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Package Chek APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Grant Execute Permission for Gradle Wrapper
+        run: |
+          cd android-client
+          if [ -f gradlew ]; then
+            chmod +x gradlew
+          fi
+
+      - name: Build Debug APK
+        run: |
+          cd android-client
+          # Use Gradle to assemble the debug APK
+          gradle assembleDebug || (gradle wrapper && ./gradlew assembleDebug)
+
+      - name: Rename APK for Easy Access
+        run: |
+          mkdir -p output-apk
+          find android-client/app/build/outputs/apk -name "*.apk" -exec cp {} output-apk/chek-companion.apk \; || true
+          ls -la output-apk/
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chek-android-app
+          path: output-apk/chek-companion.apk
+          retention-days: 30

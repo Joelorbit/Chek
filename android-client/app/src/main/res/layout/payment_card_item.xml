@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/paymentCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/eyu_surface_dark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="12dp">
+
+        <!-- ── Row 1: Provider Badge + Amount ── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <!-- Provider Pill Badge -->
+            <TextView
+                android:id="@+id/tvProviderBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="● CBE"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:background="@drawable/provider_badge_bg"
+                android:letterSpacing="0.05" />
+
+            <!-- Spacer -->
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Amount (right-aligned, bold) -->
+            <TextView
+                android:id="@+id/tvAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+300.00 ETB"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/eyu_ink_dark"
+                android:gravity="end" />
+        </LinearLayout>
+
+        <!-- ── Row 2: Payer Name + Account ── -->
+        <TextView
+            android:id="@+id/tvPayer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="From: Mr Eyuel (1*****7638)"
+            android:textSize="12sp"
+            android:textColor="@color/eyu_ink_muted_dark"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+        <!-- ── Divider ── -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/eyu_border"
+            android:layout_marginBottom="8dp" />
+
+        <!-- ── Row 3: Ref ID + Status + Timestamp ── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Reference ID (monospace) -->
+            <TextView
+                android:id="@+id/tvRef"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Ref: FT26214MQPWP"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:textColor="@color/eyu_golden_ochre"
+                android:ellipsize="end"
+                android:maxLines="1" />
+
+            <!-- Cloud Sync Status -->
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="● Synced ✓"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:textColor="@color/eyu_olive_moss"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <!-- Timestamp -->
+        <TextView
+            android:id="@+id/tvTimestamp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Today • 09:15 PM"
+            android:textSize="9sp"
+            android:textColor="@color/eyu_ink_muted_dark"
+            android:layout_marginTop="4dp" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
